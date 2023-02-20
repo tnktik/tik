@@ -1,0 +1,449 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <title>むーぶ</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<span id="hp"></span>
+<canvas id="vertical_line" height="900" width="400"></canvas>
+<canvas id="pad" height="450" width="400"></canvas>
+  <script src="script.js"></script>
+<div id="coords">X:<span id="x"></span> Y:<span id="y"></span></div>
+  <script src="script.js"></script>
+  <div id="aaa"></div>
+  <script src="script.js"></script>
+</body>　
+<form>
+<script>
+var tou = document.getElementById('vertical_line');
+
+
+var NUM = 0;
+const WIDTH = 400;
+const HEIGHT = 400;
+var hp=20;
+var radius = new Array(NUM);
+var r =  new Array(NUM);
+var g =  new Array(NUM);
+var b =  new Array(NUM);
+var rad = new Array(NUM);
+var degree = new Array(NUM);　
+var starx=new Array(NUM);　
+var stary=new Array(NUM);　
+var p=0;
+var centerx=0;
+var centery=0; 
+var kaiten=1;
+var speed=1;
+var score=0;
+var rasen=0;
+var touchx=0;
+var touchy=0;
+var toux=0;
+var touy=0;
+var n=1;
+var speed=n;
+var bulletx=new Array(NUM);
+var bullety=new Array(NUM);
+var distance=new Array(NUM);
+var x=new Array(NUM);
+var y=new Array(NUM);
+var vx=new Array(NUM);
+var vy=new Array(NUM);
+var xx=new Array(NUM);
+var yy=new Array(NUM);
+var rasenx=new Array(NUM);
+var raseny=new Array(NUM);
+var transform=1;
+window.addEventListener('load', function(e) {
+transform=Math.floor(Math.random()*6);
+ct=tou.getContext('2d');
+ct.beginPath();
+ct.strokeStyle="black";
+ct.rect(0,0,1600,1600);
+ct.stroke();   
+ct.closePath();
+setInterval(draw,11);
+centerx=Math.random()*400;
+centery=Math.random()*400;
+document.querySelector('#hp').innerHTML = hp;
+for(var i = 0; i < 100; i++){
+starx[i]=Math.random()*400;
+stary[i]=Math.random()*400;
+ct.beginPath();
+ct.fillStyle = "rgba(800,800,800,.1)";
+ct.fillRect(starx[i], stary[i], starx[i]+1, stary[i]+1);
+ct.fill();
+ct.closePath();
+}
+},false);
+
+
+
+tou.addEventListener('touchstart', function(e) {
+  event.preventDefault();    
+touchx=e.changedTouches[0].pageX;
+touchy=e.changedTouches[0].pageY;
+}, false);　
+tou.addEventListener('touchmove', function(e) {
+  event.preventDefault();    
+toux=e.changedTouches[0].pageX;
+touy=e.changedTouches[0].pageY;
+centerx-=touchx-toux;
+centery-=touchy-touy;
+touchx=e.changedTouches[0].pageX;
+touchy=e.changedTouches[0].pageY;
+
+if(centerx<=0){
+centerx=0;
+}
+if(centerx>=400){
+centerx=400;
+}
+if(centery<=0){
+centery=0;
+}
+if(centery>=400){
+centery=400;
+}
+
+}, false);　
+tou.addEventListener('touchend',function(e){ 
+e.preventDefault();
+toux=e.changedTouches[0].pageX;
+touy=e.changedTouches[0].pageY;
+centerx-=touchx-toux;
+centery-=touchy-touy;
+touchx=null;
+touchy=null;
+}, false); 
+
+function draw(){
+score+=0.1;
+ct.globalCompositeOperation = "source-over";
+  ct.fillStyle = "rgba(8,8,12,.1)";
+ ct.fillRect(0, 0, WIDTH, HEIGHT);
+ ct.globalCompositeOperation = "lighter";
+if(Math.floor(score)==100*n){
+transform=Math.floor(Math.random()*5);
+n++;　
+speed=n/2;
+}
+if(transform==4){
+if(Math.floor(Math.random()*10)==1){
+NUM++;
+p++;
+hanatu=Math.floor(Math.random()*5);
+if(hanatu==0){
+xx[p]=Math.random()*400;
+yy[p]=0;
+}
+if(hanatu==1){
+xx[p]=Math.random()*400;
+yy[p]=400;
+}
+if(hanatu==2){
+xx[p]=0;
+yy[p]=Math.random()*400;
+}
+if(hanatu==3){
+xx[p]=400;
+yy[p]=Math.random()*400;
+}
+
+bulletx[p]=xx[p];
+bullety[p]=yy[p];
+x[p]=xx[p];
+y[p]=yy[p];
+distance[p]=Math.sqrt((centerx-bulletx[p])*(centerx-bulletx[p])+(centery-bullety[p])*(centery-bullety[p]));
+vx[p] = (centerx-bulletx[p]) / distance[p] * speed;
+vy[p] = (centery-bullety[p]) / distance[p] * speed;
+}
+gerira=Math.floor(Math.random()*400);
+if(gerira==2||gerira==3||gerira==4){
+hanatu_gerira=Math.floor(Math.random()*5);
+for(var i = 0; i < 50; i++){
+NUM++;
+p++;
+if(hanatu_gerira==0){
+xx[p]=Math.random()*400;
+yy[p]=0;
+}
+if(hanatu_gerira==1){
+xx[p]=Math.random()*400;
+yy[p]=400;
+}
+if(hanatu_gerira==2){
+xx[p]=0;
+yy[p]=Math.random()*400;
+}
+if(hanatu_gerira==3){
+xx[p]=400;
+yy[p]=Math.random()*400;
+}
+bulletx[p]=xx[p];
+bullety[p]=yy[p];
+x[p]=xx[p];
+y[p]=yy[p];　
+distance[p]=Math.sqrt((centerx-bulletx[p])*(centerx-bulletx[p])+(centery-bullety[p])*(centery-bullety[p]));
+vx[p] = (centerx-bulletx[p]) / distance[p] * speed;
+vy[p] = (centery-bullety[p]) / distance[p] * speed;
+}}
+if(gerira==1){
+for(var i = 0; i < 25; i++){
+hanatu_gerira=Math.floor(Math.random()*5);
+NUM++;
+p++;
+if(hanatu_gerira==0){
+xx[p]=Math.random()*400;
+yy[p]=0;
+}
+if(hanatu_gerira==1){
+xx[p]=Math.random()*400;
+yy[p]=400;
+}
+if(hanatu_gerira==2){
+xx[p]=0;
+yy[p]=Math.random()*400;
+}
+if(hanatu_gerira==3){
+xx[p]=400;
+yy[p]=Math.random()*400;
+}
+bulletx[p]=xx[p];
+bullety[p]=yy[p];
+x[p]=xx[p];
+y[p]=yy[p];　
+distance[p]=Math.sqrt((centerx-bulletx[p])*(centerx-bulletx[p])+(centery-bullety[p])*(centery-bullety[p]));
+vx[p] = (centerx-bulletx[p]) / distance[p] * speed;
+vy[p] = (centery-bullety[p]) / distance[p] * speed;
+}
+}
+if(gerira==7){　
+for(var i = 0; i < 9; i++){　
+NUM++
+p++
+rad[i]=i-200;
+degree[i]=40*i+1;
+radius[i]=degree[i] * Math.PI / 180;
+     }
+rasen=1;
+}
+if(rasen==1){
+for(var i = 0; i < 9; i++){　
+degree[i]+=1;
+rad[i]+=2;
+radius[i]=degree[i] * Math.PI / 180;
+rasenx[i] = WIDTH/2 + rad[i] * Math.cos(radius[i]);
+raseny[i] = HEIGHT/2 + rad[i] * Math.sin(radius[i]);
+ct.beginPath();
+ct.fillStyle = "rgba(800,200,200,.1)";
+ct.arc(rasenx[i], raseny[i], 5, 0, Math.PI*2.0, true);
+ct.fill();
+if(rasenx[i]<=centerx+10&&rasenx[i]>=centerx-10&&raseny[i]<=centery+10&&raseny[i]>=centery-10){ 
+radius.splice(i,1);
+rad.splice(i,1);
+degree.splice(i,1);
+p--;
+hp--;
+document.querySelector('#hp').innerHTML = hp;
+if(hp==0){
+alert("ゲームオーバー　得点:"+Math.floor(score));
+}}
+}
+}
+}　
+if(transform==5){
+gerira=Math.floor(Math.random()*100);
+if(gerira==7){　
+for(var i = 0; i < 9; i++){　
+NUM++
+p++
+rad[i]=i-200;
+degree[i]=40*i+1;
+radius[i]=degree[i] * Math.PI / 180;
+rasen_centerx=Math.floor(Math.random()*200)+100;
+rasen_centery=Math.floor(Math.random()*200)+100;
+     }
+rasen=1;
+}
+if(rasen==1){
+for(var i = 0; i < 9; i++){　
+degree[i]+=1;
+rad[i]+=2;
+radius[i]=degree[i] * Math.PI / 180;
+rasenx[i] = rasen_centerx + rad[i] * Math.cos(radius[i]);
+raseny[i] = rasen_centery + rad[i] * Math.sin(radius[i]);
+ct.beginPath();
+ct.fillStyle = "rgba(800,200,200,.1)";
+ct.arc(rasenx[i], raseny[i], 5, 0, Math.PI*2.0, true);
+ct.fill();
+if(rasenx[i]<=centerx+10&&rasenx[i]>=centerx-10&&raseny[i]<=centery+10&&raseny[i]>=centery-10){ 
+radius.splice(i,1);
+rad.splice(i,1);
+degree.splice(i,1);
+p--;
+hp--;
+document.querySelector('#hp').innerHTML = hp;
+if(hp==0){
+alert("ゲームオーバー　得点:"+Math.floor(score));
+}}}}
+
+}
+if(transform==0){
+hanatu=Math.floor(Math.random()*2);
+if(hanatu==1){
+NUM++;
+p++;
+xx[p]=200;
+yy[p]=200;
+bulletx[p]=xx[p];
+bullety[p]=yy[p];
+x[p]=xx[p];
+y[p]=yy[p];　
+distance[p]=Math.sqrt((centerx-bulletx[p])*(centerx-bulletx[p])+(centery-bullety[p])*(centery-bullety[p]));
+vx[p] = (centerx-bulletx[p]) / distance[p] * speed;
+vy[p] = (centery-bullety[p]) / distance[p] * speed;
+}
+if(hanatu==0){
+NUM++;
+p++;
+xx[p]=200;
+yy[p]=200;
+bulletx[p]=xx[p];
+bullety[p]=yy[p];
+x[p]=xx[p];
+y[p]=yy[p];　
+targetx=Math.random()*400;
+targety=Math.random()*400;
+distance[p]=Math.sqrt((targetx-bulletx[p])*(targetx-bulletx[p])+(targety-bullety[p])*(targety-bullety[p]));
+vx[p] = (targetx-bulletx[p]) / distance[p] * speed;
+vy[p] = (targety-bullety[p]) / distance[p] * speed;
+}
+}
+if(transform==1){
+
+NUM++;
+p++;
+xx[p]=200;
+yy[p]=200;
+bulletx[p]=xx[p];
+bullety[p]=yy[p];
+x[p]=xx[p];
+y[p]=yy[p];　
+targetx=Math.random()*400;
+targety=Math.random()*400;
+distance[p]=Math.sqrt((targetx-bulletx[p])*(targetx-bulletx[p])+(targety-bullety[p])*(targety-bullety[p]));
+vx[p] = (targetx-bulletx[p]) / distance[p] * speed;
+vy[p] = (targety-bullety[p]) / distance[p] * speed;
+}
+
+if(transform==3){
+
+NUM++;
+p++;
+xx[p]=200;
+yy[p]=2;
+bulletx[p]=xx[p];
+bullety[p]=yy[p];
+x[p]=xx[p];
+y[p]=yy[p];　
+targetx=Math.random()*400;
+targety=Math.random()*400;
+distance[p]=Math.sqrt((targetx-bulletx[p])*(targetx-bulletx[p])+(targety-bullety[p])*(targety-bullety[p]));
+vx[p] = (targetx-bulletx[p]) / distance[p] * speed;
+vy[p] = (targety-bullety[p]) / distance[p] * speed;
+}
+
+if(transform==2){
+if(Math.floor(Math.random()*2)==1){
+NUM++;
+p++;
+hanatu_gerira=Math.floor(Math.random()*5);
+if(hanatu_gerira==0){
+xx[p]=200;
+yy[p]=1;
+}
+if(hanatu_gerira==1){
+xx[p]=200;
+yy[p]=399;
+}
+if(hanatu_gerira==2){
+xx[p]=1;
+yy[p]=200;
+}
+if(hanatu_gerira==3){
+xx[p]=399;
+yy[p]=200;
+}
+
+
+bulletx[p]=xx[p];
+bullety[p]=yy[p];
+x[p]=xx[p];
+y[p]=yy[p];　
+distance[p]=Math.sqrt((centerx-bulletx[p])*(centerx-bulletx[p])+(centery-bullety[p])*(centery-bullety[p]));
+vx[p] = (centerx-bulletx[p]) / distance[p] * speed;
+vy[p] = (centery-bullety[p]) / distance[p] * speed;
+}
+}
+
+
+ct.beginPath();
+ ct.fillStyle = "rgba(0,64,250,.1)";
+ct.arc(centerx, centery, 10 , 0, Math.PI*2.0, true);
+ct.fill();
+ct.closePath();
+for(var i = 0; i < NUM; i++){
+x[i]+=vx[i];
+y[i]+=vy[i];
+ct.beginPath();
+ct.fillStyle = "rgba(800,200,200,.1)";
+ct.arc(x[i],y[i],5,0,Math.PI*2.0,true);
+ct.fill();
+ct.closePath();
+if(x[i]<=0||x[i]>=400||y[i]<=0||y[i]>=400){ 
+bulletx.splice(i,1);
+bullety.splice(i,1);
+x.splice(i,1);
+y.splice(i,1);
+distance.splice(i,1);
+vx.splice(i,1);
+vy.splice(i,1);
+xx.splice(i,1);
+yy.splice(i,1);
+p--;
+}
+if(x[i]<=centerx+10&&x[i]>=centerx-10&&y[i]<=centery+10&&y[i]>=centery-10){ 
+bulletx.splice(i,1);
+bullety.splice(i,1);
+x.splice(i,1);
+y.splice(i,1);
+distance.splice(i,1);
+vx.splice(i,1);
+vy.splice(i,1);
+xx.splice(i,1);
+yy.splice(i,1);
+p--;
+hp--;
+document.querySelector('#hp').innerHTML = hp;
+if(hp==0){
+alert("ゲームオーバー　得点:"+Math.floor(score));
+}
+}
+    }
+for(var i = 0; i < 100; i++){
+ct.beginPath();
+ct.fillStyle = "rgba(200,200,200,.1)";
+ct.fillRect(starx[i], stary[i], 1, 1);
+ct.fill();
+ct.closePath();
+}
+}
+</script>
+
+</form>
+</html>

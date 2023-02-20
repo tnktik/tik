@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>Canvas tutorial template</title>
+  <body onload="init();">
+スコア:<span id="score"></span>   体力:<span id="hurt"></span>   弾レベル:<span id="bullv"></span>   アップグレード:<span id="upgrade"></span>
+    <canvas id="display" width="950" height="800"></canvas>
+<canvas id="panel" width="950" height="450"></canvas>
+
+<BR>
+1位:<span id="rank0"></span>
+ 2位:<span id="rank1"></span>
+ 3位:<span id="rank2"></span>
+ 4位:<span id="rank3"></span>
+ 5位:<span id="rank4"></span>
+  </body>
+   <script>
+var NUM=0;
+var maxbul=0;
+var teki_kazu=2;
+var tekir_kazu=1;
+const WIDTH=950;
+const HEIGHT=800;
+var bulx=new Array(NUM);
+var buly=new Array(NUM);
+var tekix=new Array(NUM);
+var tekiy=new Array(NUM);
+var tekirx=new Array(tekir_kazu);
+var tekiry=new Array(tekir_kazu);
+var mybulx=new Array(maxbul);
+var mybuly=new Array(maxbul);
+var ranking=[0,0,0,0,0];
+var strrank="";
+var count=0;
+var r=0;
+var g=0;
+var b=0;
+var bulsp=15;
+var ccc;
+var ctx;  
+var teki=function(hp,name,zr,zg,zb){
+this.hp=hp;
+this.name=name; 
+this.zr=zr;
+this.zg=zg; 
+this.zb=zb;
+}
+var zako=new teki(1,"zako",0,0,20);
+var redzako=new teki(1,"redzako",20,0,0); 
+var boss=new teki(50,"boss",20,0,20); 
+var score=0; 
+var hp=2;
+var transform=2;
+var distance;
+var vx=new Array(NUM);
+var vy=new Array(NUM);
+var display=document.getElementById("display");
+var panel=document.getElementById("panel");
+var upgradeam=100;
+var tx=680;
+var ty=500;
+var speed=new Array(NUM);
+
+function init(){
+strrank=localStorage.getItem("strrank"); 
+ranking=strrank.split(",");
+
+ctx = display.getContext('2d');
+ccc = panel.getContext('2d');
+bulx[0]=Math.random()*WIDTH;
+buly[0]=Math.random()*HEIGHT;
+mybulx[0]=tx;
+mybuly[0]=ty;
+r[0]=Math.floor(Math.random()*64);
+g[0]=Math.floor(Math.random()*64);
+b[0]=Math.floor(Math.random()*64);
+speed[0]=Math.floor(Math.random()*10+2);
+distance=Math.sqrt((tx-bulx[0])*(tx-bulx[0])+(ty-buly[0])*(ty-buly[0]));
+vx[0]=(tx-bulx[0])/distance*speed[0];
+vy[0]=(ty-buly[0])/distance*speed[0];
+for(var i=0;i<teki_kazu;i++){
+tekix[i]=Math.random()*300+600;
+tekiy[i]=Math.random()*HEIGHT;
+document.querySelector('#score').innerHTML = score;
+document.querySelector('#rank0').innerHTML = ranking[0];
+document.querySelector('#rank1').innerHTML = ranking[1];
+document.querySelector('#rank2').innerHTML = ranking[2];
+document.querySelector('#rank3').innerHTML = ranking[3];
+document.querySelector('#rank4').innerHTML = ranking[4];
+document.querySelector('#hurt').innerHTML = hp;
+document.querySelector('#bullv').innerHTML = 16-bulsp; 
+document.querySelector('#upgrade').innerHTML = upgradeam;
+}
+
+tekirx[0]=Math.random()*300+600;
+tekiry[0]=Math.random()*HEIGHT;
+setInterval(draw, 33);
+setInterval(increase_bullet,50);
+setInterval(my_bullet,100);
+
+}
+function my_bullet(){
+count++;
+if(count>=bulsp){
+count=0;
+mybulx.push(tx);
+mybuly.push(ty);
+maxbul++;
+}
+}
+function increase_bullet(){
+appear=Math.floor(Math.random()*50);
+if(appear==0){
+teki_kazu++;
+tekix.push(Math.random()*300+600);
+tekiy.push(Math.random()*HEIGHT);
+}
+appearr=Math.floor(Math.random()*500);
+if(appearr==0){
+tekir_kazu++;
+tekirx.push(Math.random()*300+600);
+tekiry.push(Math.random()*HEIGHT);
+}
+appearb=Math.floor(Math.random()*20/teki_kazu);
+if(appearb==0){
+NUM++;
+speed.push(Math.floor(Math.random()*10+1));
+dare=Math.floor(Math.random()*teki_kazu);
+bulx.push(tekix[dare]);
+buly.push(tekiy[dare]);
+distance=Math.sqrt((tx-bulx[NUM])*(tx-bulx[NUM])+(ty-buly[NUM])*(ty-buly[NUM]));
+vx[NUM]=(tx-bulx[NUM])/distance*speed[NUM];
+vy[NUM]=(ty-buly[NUM])/distance*speed[NUM];
+
+}
+
+}
+panel.addEventListener('touchstart',function(e){ 
+e.preventDefault();
+touchx=e.changedTouches[0].pageX;
+touchy=e.changedTouches[0].pageY;
+if(touchx<=100&&touchy<=1000){
+alert("ポーズメニュー");
+}
+if(touchx<=100&&touchy>1000&&touchy<=1150&&upgradeam>0){
+if(bulsp>5){
+upgradeam--;
+bulsp--;
+document.querySelector('#bullv').innerHTML = 16-bulsp;
+document.querySelector('#upgrade').innerHTML = upgradeam;
+}
+if(bulsp<5){
+bulsp=5;
+alert("最大レベルです");
+}
+}
+if(touchx<=100&&touchy>1150&&touchy<=1300&&upgradeam>0){
+upgradeam--;
+hp++;
+document.querySelector('#upgrade').innerHTML = upgradeam;
+document.querySelector('#hurt').innerHTML = hp;
+}
+}, false);
+panel.addEventListener('touchmove',function(e){ 
+e.preventDefault();
+toux=e.changedTouches[0].pageX;
+touy=e.changedTouches[0].pageY;
+tx-=touchx-toux;
+ty-=touchy-touy;
+touchx=e.changedTouches[0].pageX;
+touchy=e.changedTouches[0].pageY;
+}, false); 
+panel.addEventListener('touchend',function(e){ 
+e.preventDefault();
+toux=e.changedTouches[0].pageX;
+touy=e.changedTouches[0].pageY;
+tx-=touchx-toux;
+ty-=touchy-touy;
+touchx=null;
+touchy=null;
+}, false); 
+
+function draw(){
+ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = "rgba(8,8,12,.1)";
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    ctx.globalCompositeOperation = "lighter";
+
+
+ccc.globalCompositeOperation = "source-over";
+    ccc.fillStyle = "rgba(8,8,12,.1)";
+    ccc.fillRect(100, 0, WIDTH, HEIGHT);
+ ccc.fillStyle = "rgba(100,8,12,.1)";
+    ccc.fillRect(0, 0, 100, 150);
+ ccc.fillStyle = "rgba(0,100,12,.1)";
+    ccc.fillRect(0, 150, 100, 150);
+ ccc.fillStyle = "rgba(0,8,100,.1)";
+    ccc.fillRect(0, 300, 100, 150);
+    ccc.globalCompositeOperation = "lighter";
+ ctx.beginPath();
+ctx.fillStyle = 'rgb(100,100,100)';
+ctx.arc(tx,ty,10,0,Math.PI*2.0,true);
+            ctx.fill();
+if(tx<0){
+tx=950;
+}
+if(tx>950){
+tx=0;
+}
+if(ty<0){
+ty=800;
+}
+if(ty>800){
+ty=0;
+}
+ctx.closePath();
+    for(var i = 0; i <= NUM; i++){
+bulx[i]+=vx[i];
+buly[i]+=vy[i];
+        ctx.beginPath();
+        ctx.fillStyle = 'rgb(' + r[i] + ',' + g[i] + ',' + b[i] + ')';
+            ctx.arc(bulx[i], buly[i], 5, 0, Math.PI*2.0, true);
+            ctx.fill();
+ctx.closePath();
+
+if(tx<=bulx[i]+10&&tx>=bulx[i]- 10&&ty<=buly[i]+10&&ty>=buly[i]-10){
+bulx.splice(i,1);
+buly.splice(i,1);
+speed.splice(i,1); 
+vx.splice(i,1); 
+vy.splice(i,1); 
+NUM--;
+hp--;
+document.querySelector('#hurt').innerHTML = hp;
+if(hp==0){
+alert("gameover  "+score);
+ranking.push(score);
+ranking.sort(shoujun); 
+strrank=ranking.toString();
+localStorage.strrank=strrank;
+ranking.splice(5,1);
+}
+}
+if(bulx[i]<=-10||bulx[i]>=960||buly[i]<=-10||buly[i]>810){
+bulx.splice(i,1);
+buly.splice(i,1);
+speed.splice(i,1); 
+vx.splice(i,1); 
+vy.splice(i,1); 
+NUM--;
+}} 
+for(var i=0;i<=maxbul;i++){
+mybulx[i]+=10;
+ctx.beginPath();
+ ctx.fillStyle = 'rgb(100,100,0)';
+ctx.arc(mybulx[i],mybuly[i],3,0,Math.PI*2.0,true);
+ctx.fill();
+ctx.closePath();
+}
+
+for(var i = 0; i < teki_kazu; i++){
+ctx.beginPath();
+ctx.fillStyle = 'rgb(5,5,50)';
+ctx.arc(tekix[i],tekiy[i],10,0,Math.PI*2.0,true);
+            ctx.fill();
+ctx.closePath();
+for(var dd = 0; dd < mybulx.length; dd++){
+if(tekix[i]<=mybulx[dd]+10&&tekix[i]>=mybulx[dd]- 10&&tekiy[i]<=mybuly[dd]+10&&tekiy[i]>=mybuly[dd]-10){
+mybulx.splice(dd,1);
+mybuly.splice(dd,1); 
+maxbul--;
+zako.hp--;
+if(zako.hp<=0){
+tekix.splice(i,1);
+tekiy.splice(i,1);
+teki_kazu--;
+score++;
+document.querySelector('#score').innerHTML = score;
+}}}}
+for(var i = 0; i < tekir_kazu; i++){
+ctx.beginPath();
+ctx.fillStyle = 'rgb(200,0,5)';
+ctx.arc(tekirx[i],tekiry[i],10,0,Math.PI*2.0,true);
+            ctx.fill();
+ctx.closePath();
+for(var dd = 0; dd < mybulx.length; dd++){
+if(tekirx[i]<=mybulx[dd]+10&&tekirx[i]>=mybulx[dd]- 10&&tekiry[i]<=mybuly[dd]+10&&tekiry[i]>=mybuly[dd]-10){
+mybulx.splice(dd,1);
+mybuly.splice(dd,1); 
+maxbul--;
+redzako.hp--;
+if(redzako.hp<=0){
+tekirx.splice(i,1);
+tekiry.splice(i,1);
+tekir_kazu--;
+upgradeam++;
+score+=4;
+redzako.hp=1;
+document.querySelector('#upgrade').innerHTML = upgradeam;
+}}}}
+
+}
+function shoujun(a,b){
+return b-a;
+}
+
+</script>
+    <style type="text/css">
+      
+    </style>
+  </head>
+</html>
