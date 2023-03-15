@@ -1,6 +1,5 @@
 import numpy as np
 import math
-import sympy as sym
 import matplotlib.pyplot as plt
 class ALD:
     def random_density_function(x,mean,b):
