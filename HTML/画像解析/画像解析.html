@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <title>画像解析</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>画像解析</h1>
+<canvas id="board" width="300" height="300"></canvas>
+<BR>
+  赤:<div id="r_d"></div> 緑:<div id="g_d"></div> 青:<div id="b_d"></div>
+
+<BR>
+<canvas id="can" width="300" height="300"></canvas>
+<script>
+const WIDTH=300;
+const HEIGHT=300;
+  // canvas準備
+  const board = document.querySelector("#board");  
+  const ctx = board.getContext("2d");
+  const can = document.querySelector("#can");  
+  const con = can.getContext("2d");
+
+  // 画像読み込み
+  const chara = new Image();
+  chara.src = "S__3923973.jpg";  // 画像のURLを指定
+  chara.onload = () => {
+    ctx.drawImage(chara, 0, 0);
+  };
+function analysis(){
+imgdt=ctx.getImageData(0,0,WIDTH,HEIGHT);
+n=0
+data=imgdt.data;
+r_data=[];
+g_data=[];
+b_data=[];
+for(var i=0;i<WIDTH;i++){
+for(var j=0;j<HEIGHT;j++){
+if(n%4==0){
+r_data.push(data[n])
+}
+if(n%4==1){
+g_data.push(data[n])
+}
+if(n%4==2){
+b_data.push(data[n])
+}
+
+n++;
+}
+}
+
+  document.querySelector('#r_d').innerHTML = r_data;
+  document.querySelector('#g_d').innerHTML = g_data;
+  document.querySelector('#b_d').innerHTML = b_data;
+
+}
+board.addEventListener('touchstart', function(e) {
+ event.preventDefault();    
+const offset=this.getBoundingClientRect();
+touchx=Math.floor(e.changedTouches[0].pageX-offset.left);
+touchy=Math.floor(e.changedTouches[0].pageY-offset.top);
+a=touchx+(WIDTH)*touchy;
+ctx.drawImage(chara, 0, 0);
+ctx.beginPath();
+ctx.strokeStyle="red";
+ctx.arc(touchx,touchy,10,0,2*Math.PI,false);
+ctx.stroke();
+imgdt=ctx.getImageData(0,0,WIDTH,HEIGHT);
+data=imgdt.data;
+n=0;
+r_data=[];
+g_data=[];
+b_data=[];
+for(var i=0;i<WIDTH*HEIGHT*4;i++){
+if(n%4==0){
+r_data.push(data[n])
+}
+if(n%4==1){
+g_data.push(data[n])
+}
+if(n%4==2){
+b_data.push(data[n])
+}
+
+n++;
+}
+
+  document.querySelector('#r_d').innerHTML = r_data[a];
+  document.querySelector('#g_d').innerHTML = g_data[a];
+  document.querySelector('#b_d').innerHTML = b_data[a];
+rgb="rgb("+r_data[a]+","+g_data[a]+","+b_data[a]+")";
+con.fillStyle=rgb;
+con.fillRect(0,0,WIDTH,HEIGHT);
+
+}, false);　
+
+board.addEventListener('touchmove', function(e) {
+ event.preventDefault();    
+const offset=this.getBoundingClientRect();
+touchx=Math.floor(e.changedTouches[0].pageX-offset.left);
+touchy=Math.floor(e.changedTouches[0].pageY-offset.top);
+a=touchx+(WIDTH)*touchy;
+ctx.drawImage(chara, 0, 0);
+ctx.beginPath();
+ctx.strokeStyle="red";
+ctx.arc(touchx,touchy,10,0,2*Math.PI,false);
+ctx.stroke();
+imgdt=ctx.getImageData(0,0,WIDTH,HEIGHT);
+data=imgdt.data;
+n=0;
+r_data=[];
+g_data=[];
+b_data=[];
+for(var i=0;i<WIDTH*HEIGHT*4;i++){
+if(n%4==0){
+r_data.push(data[n])
+}
+if(n%4==1){
+g_data.push(data[n])
+}
+if(n%4==2){
+b_data.push(data[n])
+}
+
+n++;
+}
+
+  document.querySelector('#r_d').innerHTML = r_data[a];
+  document.querySelector('#g_d').innerHTML = g_data[a];
+  document.querySelector('#b_d').innerHTML = b_data[a];
+rgb="rgb("+r_data[a]+","+g_data[a]+","+b_data[a]+")";
+con.fillStyle=rgb;
+con.fillRect(0,0,WIDTH,HEIGHT);
+
+}, false);　
+board.addEventListener('touchend',function(e){ 
+ event.preventDefault();    
+const offset=this.getBoundingClientRect();
+touchx=Math.floor(e.changedTouches[0].pageX-offset.left);
+touchy=Math.floor(e.changedTouches[0].pageY-offset.top);
+a=touchx+(WIDTH)*touchy;
+ctx.drawImage(chara, 0, 0);
+ctx.beginPath();
+ctx.strokeStyle="red";
+ctx.arc(touchx,touchy,10,0,2*Math.PI,false);
+ctx.stroke();
+imgdt=ctx.getImageData(0,0,WIDTH,HEIGHT);
+data=imgdt.data;
+n=0;
+r_data=[];
+g_data=[];
+b_data=[];
+for(var i=0;i<WIDTH*HEIGHT*4;i++){
+if(n%4==0){
+r_data.push(data[n])
+}
+if(n%4==1){
+g_data.push(data[n])
+}
+if(n%4==2){
+b_data.push(data[n])
+}
+
+n++;
+}
+
+  document.querySelector('#r_d').innerHTML = r_data[a];
+  document.querySelector('#g_d').innerHTML = g_data[a];
+  document.querySelector('#b_d').innerHTML = b_data[a];
+rgb="rgb("+r_data[a]+","+g_data[a]+","+b_data[a]+")";
+con.fillStyle=rgb;
+con.fillRect(0,0,WIDTH,HEIGHT);
+}, false); 
+
+</script>
+</body>
+</html>
