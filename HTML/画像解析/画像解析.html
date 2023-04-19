@@ -25,37 +25,38 @@ const HEIGHT=300;
 
   // 画像読み込み
   const chara = new Image();
-  chara.src = "S__3923973.jpg";  // 画像のURLを指定
+  chara.src = "img/20230420024551.png";  // 画像のURLを指定
   chara.onload = () => {
     ctx.drawImage(chara, 0, 0);
-  };
-function analysis(){
 imgdt=ctx.getImageData(0,0,WIDTH,HEIGHT);
-n=0
 data=imgdt.data;
 r_data=[];
 g_data=[];
 b_data=[];
-for(var i=0;i<WIDTH;i++){
-for(var j=0;j<HEIGHT;j++){
-if(n%4==0){
-r_data.push(data[n])
+for(var i=0;i<WIDTH*HEIGHT*4;i++){
+if(i%4==0){
+r_data.push(data[i])
 }
-if(n%4==1){
-g_data.push(data[n])
+if(i%4==1){
+g_data.push(data[i])
 }
-if(n%4==2){
-b_data.push(data[n])
+if(i%4==2){
+b_data.push(data[i])
 }
+}
+  };
 
-n++;
+function touch_draw(tx,ty){
+ctx.drawImage(chara, 0, 0);
+ctx.beginPath();
+ctx.strokeStyle="red";
+ctx.arc(tx,ty,10,0,2*Math.PI,false);
+ctx.stroke();
 }
-}
-
-  document.querySelector('#r_d').innerHTML = r_data;
-  document.querySelector('#g_d').innerHTML = g_data;
-  document.querySelector('#b_d').innerHTML = b_data;
-
+function draw(a){
+rgb="rgb("+r_data[a]+","+g_data[a]+","+b_data[a]+")";
+con.fillStyle=rgb;
+con.fillRect(0,0,WIDTH,HEIGHT);
 }
 board.addEventListener('touchstart', function(e) {
  event.preventDefault();    
@@ -63,37 +64,11 @@ const offset=this.getBoundingClientRect();
 touchx=Math.floor(e.changedTouches[0].pageX-offset.left);
 touchy=Math.floor(e.changedTouches[0].pageY-offset.top);
 a=touchx+(WIDTH)*touchy;
-ctx.drawImage(chara, 0, 0);
-ctx.beginPath();
-ctx.strokeStyle="red";
-ctx.arc(touchx,touchy,10,0,2*Math.PI,false);
-ctx.stroke();
-imgdt=ctx.getImageData(0,0,WIDTH,HEIGHT);
-data=imgdt.data;
-n=0;
-r_data=[];
-g_data=[];
-b_data=[];
-for(var i=0;i<WIDTH*HEIGHT*4;i++){
-if(n%4==0){
-r_data.push(data[n])
-}
-if(n%4==1){
-g_data.push(data[n])
-}
-if(n%4==2){
-b_data.push(data[n])
-}
-
-n++;
-}
-
-  document.querySelector('#r_d').innerHTML = r_data[a];
-  document.querySelector('#g_d').innerHTML = g_data[a];
-  document.querySelector('#b_d').innerHTML = b_data[a];
-rgb="rgb("+r_data[a]+","+g_data[a]+","+b_data[a]+")";
-con.fillStyle=rgb;
-con.fillRect(0,0,WIDTH,HEIGHT);
+touch_draw(touchx,touchy);
+draw(a);
+document.querySelector('#r_d').innerHTML = r_data[a];
+document.querySelector('#g_d').innerHTML = g_data[a];
+document.querySelector('#b_d').innerHTML = b_data[a];
 
 }, false);　
 
@@ -103,37 +78,12 @@ const offset=this.getBoundingClientRect();
 touchx=Math.floor(e.changedTouches[0].pageX-offset.left);
 touchy=Math.floor(e.changedTouches[0].pageY-offset.top);
 a=touchx+(WIDTH)*touchy;
-ctx.drawImage(chara, 0, 0);
-ctx.beginPath();
-ctx.strokeStyle="red";
-ctx.arc(touchx,touchy,10,0,2*Math.PI,false);
-ctx.stroke();
-imgdt=ctx.getImageData(0,0,WIDTH,HEIGHT);
-data=imgdt.data;
-n=0;
-r_data=[];
-g_data=[];
-b_data=[];
-for(var i=0;i<WIDTH*HEIGHT*4;i++){
-if(n%4==0){
-r_data.push(data[n])
-}
-if(n%4==1){
-g_data.push(data[n])
-}
-if(n%4==2){
-b_data.push(data[n])
-}
+touch_draw(touchx,touchy);
+draw(a);
+document.querySelector('#r_d').innerHTML = r_data[a];
+document.querySelector('#g_d').innerHTML = g_data[a];
+document.querySelector('#b_d').innerHTML = b_data[a];
 
-n++;
-}
-
-  document.querySelector('#r_d').innerHTML = r_data[a];
-  document.querySelector('#g_d').innerHTML = g_data[a];
-  document.querySelector('#b_d').innerHTML = b_data[a];
-rgb="rgb("+r_data[a]+","+g_data[a]+","+b_data[a]+")";
-con.fillStyle=rgb;
-con.fillRect(0,0,WIDTH,HEIGHT);
 
 }, false);　
 board.addEventListener('touchend',function(e){ 
@@ -142,38 +92,15 @@ const offset=this.getBoundingClientRect();
 touchx=Math.floor(e.changedTouches[0].pageX-offset.left);
 touchy=Math.floor(e.changedTouches[0].pageY-offset.top);
 a=touchx+(WIDTH)*touchy;
-ctx.drawImage(chara, 0, 0);
-ctx.beginPath();
-ctx.strokeStyle="red";
-ctx.arc(touchx,touchy,10,0,2*Math.PI,false);
-ctx.stroke();
-imgdt=ctx.getImageData(0,0,WIDTH,HEIGHT);
-data=imgdt.data;
-n=0;
-r_data=[];
-g_data=[];
-b_data=[];
-for(var i=0;i<WIDTH*HEIGHT*4;i++){
-if(n%4==0){
-r_data.push(data[n])
-}
-if(n%4==1){
-g_data.push(data[n])
-}
-if(n%4==2){
-b_data.push(data[n])
-}
+touch_draw(touchx,touchy);
+draw(a);
+document.querySelector('#r_d').innerHTML = r_data[a];
+document.querySelector('#g_d').innerHTML = g_data[a];
+document.querySelector('#b_d').innerHTML = b_data[a];
 
-n++;
-}
 
-  document.querySelector('#r_d').innerHTML = r_data[a];
-  document.querySelector('#g_d').innerHTML = g_data[a];
-  document.querySelector('#b_d').innerHTML = b_data[a];
-rgb="rgb("+r_data[a]+","+g_data[a]+","+b_data[a]+")";
-con.fillStyle=rgb;
-con.fillRect(0,0,WIDTH,HEIGHT);
 }, false); 
+
 
 </script>
 </body>
