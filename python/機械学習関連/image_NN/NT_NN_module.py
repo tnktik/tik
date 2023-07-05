@@ -1,54 +1,59 @@
 import numpy as np
 import random
-#整数判定
-def is_integer_num(n):
-    if isinstance(n, int):
-        return True
-    if isinstance(n, float):
-        return n.is_integer()
-    return False
-
-#ハイパーパラメータ
-learning_rate=0.5
 
 #活性化関数
 class activate_function():
     class ReLU():
         #関数
         def func(x):
-            if x>0:
-                return x
-            if x<=0:
-                return 0
+            y=np.array([])
+            for i in range(len(x)):
+                if x[i]>0:
+                    y=np.append(y,x[i])
+                if x[i]<=0:
+                    y=np.append(y,0)
+            return y
         #微分
         def dif(x):
-            if x>0:
-                return 1
-            if x<=0:
-                return 0
+            y=np.array([])
+            for i in range(len(x)):
+                if x[i]>0:
+                    y=np.append(y,1)
+                if x[i]<=0:
+                    y=np.append(y,0)
+            return y
     #ソフトマックス関数 
     class Softmax():
-        def func(x,list_x):
-            return np.exp(x)/np.sum(np.exp(list_x))
-        def dif(x,list_x):
-            return activate_function.Softmax.func(x,list_x)*(1-activate_function.Softmax.func(x,list_x))
+        def func(x):
+            return np.exp(x)/np.sum(np.exp(x))
+        def dif(x):
+            return activate_function.Softmax.func(x)*(1-activate_function.Softmax.func(x))
     #シグモイド関数
     class Sigmoid():
         def func(x):
-            return 1/(1+np.exp(-x))
+            return np.array(1/(1+np.exp(-x)))
         #本当の微分の結果
         def dif(x):
-            return activate_function.Sigmoid.func(x)*(1-activate_function.Sigmoid.func(x))
+            return np.array(activate_function.Sigmoid.func(x)*(1-activate_function.Sigmoid.func(x)))
+    class Linear():
+        def func(x):
+            return x
+        def dif(x):
+            y=np.array([])
+            for i in range(len(x)):
+                y=np.append(y,1)
+            return y
 class Layer():
     #全結合
     class FC():
         #FC(出力データ,活性化関数)
-        def __init__(self,x,output_size,activate_func=activate_function.ReLU):
+        def __init__(self,x,output_size,activate_func=activate_function.ReLU,learning_rate=0.01):
             self.x=x.ravel()
             self.weight=np.random.rand(output_size,len(self.x))
             self.bias_w=np.random.rand(output_size)
             self.output_size=output_size
             self.activate_func=activate_func
+            self.learning_rate=learning_rate
             self.h=np.zeros(self.output_size)
             self.output=np.zeros(output_size)
             self.error=np.zeros(self.x.shape)
@@ -69,66 +74,32 @@ class Layer():
             self.bias_w=bw
         #前方方向
         def forward(self,x):
-            self.x=x.ravel()
-            for i in range(self.output_size):
-                #内積
-                h=np.dot(x.ravel(),self.weight[i])
-                self.h[i]=h+self.bias_w[i]
-            if self.activate_func==activate_function.Softmax:
-                for i in range(self.output_size):
-                    #活性化関数にバイアスとセットで
-                    y=self.activate_func.func(self.h[i],self.h)
-                    #出力を保存
-                    self.output[i]=y
-            else:
-                #出力のサイズだけループ
-                for i in range(self.output_size):
-                    #活性化関数にバイアスとセットで
-                    y=self.activate_func.func(self.h[i])
-                    #出力を保存
-                    self.output[i]=y
+            self.x=np.array(x.ravel())
+            #内積
+            h=x.ravel()@self.weight.T
+            self.h=h+self.bias_w
+            #活性化関数にバイアスとセットで
+            self.output=self.activate_func.func(self.h)
             return self.output
         #出力層の逆伝搬につかう
         def first_backward(self,teacher_vector):
-            #この層の出力サイズ
-            if self.activate_func==activate_function.Softmax:
-                for i in range(self.output_size):
-                    #誤差を保存
-                    self.out_error[i]=(self.output[i]-teacher_vector[i])*self.activate_func.dif(self.h[i],self.h)
-                    #重みを更新
-                    self.weight[i]=self.weight[i]-learning_rate*self.out_error[i]*self.x
-                    #バイアスの重みを更新
-                    self.bias_w[i]=self.bias_w[i]-learning_rate*self.out_error[i]
-            else:
-                for i in range(self.output_size):
-                    #誤差を保存
-                    self.out_error[i]=(self.output[i]-teacher_vector[i])*self.activate_func.dif(self.h[i])
-                    #重みを更新
-                    self.weight[i]=self.weight[i]-learning_rate*self.out_error[i]*self.x
-                    #バイアスの重みを更新
-                    self.bias_w[i]=self.bias_w[i]-learning_rate*self.out_error[i]
-            er=np.zeros(self.x.shape)
-            #入力データのサイズ(1次元)
-            for j in range(len(self.x)):
-                #出力のユニットをみる
-                for k in range(self.output_size):
-                    er[j]=er[j]+self.out_error[k]*self.weight[k][j]
-                self.error[j]=er[j]
+            #誤差を保存
+            self.out_error=(self.output-teacher_vector)*self.activate_func.dif(self.h)
+            #誤差を保存
+            #重みを更新
+            self.weight=self.weight-self.learning_rate*(np.array([self.out_error]).T@np.array([self.x]))
+            #バイアスの重みを更新
+            self.bias_w=self.bias_w-self.learning_rate*self.out_error
+            
+            self.error=self.out_error@self.weight     
             return self.error
         #中間層の逆伝搬に使う
-        def backward(self,forward_error):              
+        def backward(self,forward_error):    
+            forward_error=forward_error*self.activate_func.dif(self.h)    
             #以下で重みを更新していく
-            for i in range(self.output_size):
-                forward_error[i]=forward_error[i]*self.activate_func.dif(self.h[i])
-                self.weight[i]=self.weight[i]-learning_rate*forward_error[i]*self.x
-                self.bias_w[i]=self.bias_w[i]-learning_rate*forward_error[i]
-            er=np.zeros(self.x.shape)
-                #この層の誤差を見ていく
-            for j in range(len(self.x)):
-                #出力のユニットをみる
-                for k in range(self.output_size):
-                    er[j]=er[j]+forward_error[k]*self.weight[k][j]
-                self.error[j]=er[j]
+            self.weight=self.weight-self.learning_rate*(np.array([forward_error]).T@np.array([self.x]))
+            self.bias_w=self.bias_w-self.learning_rate*forward_error
+            self.error=self.out_error@self.weight 
             return self.error         
         #確率pは0～100のドロップアウト
         def Dropout(self,p):
@@ -142,12 +113,12 @@ class Layer():
 
     class CNN():
         #畳み込みニューラルネットワーク(kernelの数,kernelの高さ,kernelの横,stride,活性化関数)
-        def __init__(self,x,channel,kernel_size_H,kernel_size_W,st=1,activate_func=activate_function.ReLU):
+        def __init__(self,x,channel,kernel_size_H,kernel_size_W,st=1,activate_func=activate_function.ReLU,learning_rate=0.01):
             while(x.ndim<3):
                 x=x[np.newaxis]
             self.x=x
             #strideとデータとカーネルの都合がいいとたたみ込み可能
-            if is_integer_num((x.shape[-2]-kernel_size_H)/st) and is_integer_num((x.shape[-1]-kernel_size_W)/st):
+            if  isinstance((x.shape[-2]-kernel_size_H)/st) and isinstance((x.shape[-1]-kernel_size_W)/st):
                 self.channel=channel
                 self.kernel_size_H=kernel_size_H
                 self.kernel_size_W=kernel_size_W
@@ -160,6 +131,8 @@ class Layer():
                 self.bias_w=np.random.rand(channel,self.output_H,self.output_W)
                 #活性化関数
                 self.activate_func=activate_func
+                self.learning_rate=learning_rate
+
                 #とりあえず出力結果を作成
                 self.output=np.zeros((channel,self.output_H,self.output_W))
                 self.error=np.zeros(self.x.shape)
@@ -246,8 +219,8 @@ class Layer():
                         for i in range(self.weight.shape[-2]):
                             for j in range(self.weight.shape[-1]):
                                 #重みを修正していく
-                                self.weight[c][d][i][j]=self.weight[c][d][i][j]-learning_rate*forward_error[c][int(a/self.st)][int(b/self.st)]*self.x[d][i+a][j+b]
-                                self.bias_w[c][i][j]=self.bias_w[c][i][j]-learning_rate*forward_error[c][int(a/self.st)][int(b/self.st)]/self.x.shape[-3]
+                                self.weight[c][d][i][j]=self.weight[c][d][i][j]-self.learning_rate*forward_error[c][int(a/self.st)][int(b/self.st)]*self.x[d][i+a][j+b]
+                                self.bias_w[c][i][j]=self.bias_w[c][i][j]-self.learning_rate*forward_error[c][int(a/self.st)][int(b/self.st)]/self.x.shape[-3]
                                 #次の層に渡す誤差を求める。
                                 self.error[d][i+a][j+b]=self.error[d][i+a][j+b]+forward_error[c][int(a/self.st)][int(b/self.st)]*self.weight[c][d][i][j]
                                 print(self.error)
@@ -270,7 +243,7 @@ class Layer():
                 x=x[np.newaxis]
             self.x=x
             #strideとデータとカーネルの都合がいいとたたみ込み可能
-            if is_integer_num((x.shape[-2]-kernel_size_H)/st) and is_integer_num((x.shape[-1]-kernel_size_W)/st):
+            if isinstance((x.shape[-2]-kernel_size_H)/st) and isinstance((x.shape[-1]-kernel_size_W)/st):
                 #最終的に出力の形を求める(output_H,output_W,channel)
                 self.output_H=int(1+(x.shape[-2]-kernel_size_H)/st)
                 self.output_W=int(1+(x.shape[-1]-kernel_size_W)/st)
@@ -374,3 +347,4 @@ class Layer():
                                 b=0
                                 pool=False
                 return self.error
+
