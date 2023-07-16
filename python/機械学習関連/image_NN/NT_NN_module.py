@@ -1,6 +1,14 @@
 import numpy as np
 import random
 
+#整数判定
+def is_integer_num(n):
+    if isinstance(n, int):
+        return True
+    if isinstance(n, float):
+        return n.is_integer()
+    return False
+
 #活性化関数
 class activate_function():
     class ReLU():
@@ -25,7 +33,8 @@ class activate_function():
     #ソフトマックス関数 
     class Softmax():
         def func(x):
-            return np.exp(x)/np.sum(np.exp(x))
+            max_x=max(x)
+            return np.exp(x-max_x)/np.sum(np.exp(x-max_x))
         def dif(x):
             return activate_function.Softmax.func(x)*(1-activate_function.Softmax.func(x))
     #シグモイド関数
@@ -49,8 +58,8 @@ class Layer():
         #FC(出力データ,活性化関数)
         def __init__(self,x,output_size,activate_func=activate_function.ReLU,learning_rate=0.01):
             self.x=x.ravel()
-            self.weight=np.random.rand(output_size,len(self.x))
-            self.bias_w=np.random.rand(output_size)
+            self.weight=np.random.normal(0.0,len(self.x)**-0.5,(output_size,len(self.x)))
+            self.bias_w=np.random.normal(0.0,len(self.x)**-0.5,(output_size))
             self.output_size=output_size
             self.activate_func=activate_func
             self.learning_rate=learning_rate
@@ -59,7 +68,7 @@ class Layer():
             self.error=np.zeros(self.x.shape)
             self.out_error=np.zeros(output_size)
         #出力後のデータの形を返す
-        def output_data_size(self):
+        def output_data(self):
             return self.output
         #重みを返す
         def output_weight(self):
@@ -74,32 +83,34 @@ class Layer():
             self.bias_w=bw
         #前方方向
         def forward(self,x):
+            #データを１次元配列にする
             self.x=np.array(x.ravel())
-            #内積
-            h=x.ravel()@self.weight.T
-            self.h=h+self.bias_w
-            #活性化関数にバイアスとセットで
+            #重みとデータの内積
+            self.h=(self.x@self.weight.T)+self.bias_w
+            #上の結果を活性化関数に入れる\\
             self.output=self.activate_func.func(self.h)
             return self.output
         #出力層の逆伝搬につかう
         def first_backward(self,teacher_vector):
+            loss = np.mean((teacher_vector-self.out_error)**2)
+            #print(loss)
             #誤差を保存
             self.out_error=(self.output-teacher_vector)*self.activate_func.dif(self.h)
-            #誤差を保存
+            #誤差と重みの計算
+            self.error=self.out_error@self.weight
             #重みを更新
-            self.weight=self.weight-self.learning_rate*(np.array([self.out_error]).T@np.array([self.x]))
+            self.weight-=self.learning_rate*(np.array([self.out_error]).T@np.array([self.x]))
             #バイアスの重みを更新
-            self.bias_w=self.bias_w-self.learning_rate*self.out_error
-            
-            self.error=self.out_error@self.weight     
+            self.bias_w-=self.learning_rate*self.out_error   
             return self.error
         #中間層の逆伝搬に使う
-        def backward(self,forward_error):    
-            forward_error=forward_error*self.activate_func.dif(self.h)    
+        def backward(self,forward_error):
+            forward_error=forward_error*self.activate_func.dif(self.h) 
+            #次の層のために誤差を求める
+            self.error=forward_error@self.weight    
             #以下で重みを更新していく
-            self.weight=self.weight-self.learning_rate*(np.array([forward_error]).T@np.array([self.x]))
-            self.bias_w=self.bias_w-self.learning_rate*forward_error
-            self.error=self.out_error@self.weight 
+            self.weight-=self.learning_rate*(np.array([forward_error]).T@np.array([self.x]))
+            self.bias_w-=self.learning_rate*forward_error
             return self.error         
         #確率pは0～100のドロップアウト
         def Dropout(self,p):
@@ -118,17 +129,18 @@ class Layer():
                 x=x[np.newaxis]
             self.x=x
             #strideとデータとカーネルの都合がいいとたたみ込み可能
-            if  isinstance((x.shape[-2]-kernel_size_H)/st) and isinstance((x.shape[-1]-kernel_size_W)/st):
+            if is_integer_num((self.x.shape[-2]-kernel_size_H)/st) and is_integer_num((self.x.shape[-1]-kernel_size_W)/st):
+
                 self.channel=channel
                 self.kernel_size_H=kernel_size_H
                 self.kernel_size_W=kernel_size_W
                 #最終的に出力の形を求める(output_H,output_W,channel)
-                self.output_H=int(1+(x.shape[-2]-kernel_size_H)/st)
-                self.output_W=int(1+(x.shape[-1]-kernel_size_W)/st)
+                self.output_H=int(1+(self.x.shape[-2]-kernel_size_H)/st)
+                self.output_W=int(1+(self.x.shape[-1]-kernel_size_W)/st)
                 #重み作成
-                self.weight=np.random.rand(channel,x.shape[-3],kernel_size_H,kernel_size_W)
+                self.weight=np.random.rand(channel,self.x.shape[-3],kernel_size_H*kernel_size_W)
                 #バイアスの重みを作成
-                self.bias_w=np.random.rand(channel,self.output_H,self.output_W)
+                self.bias_w=np.random.rand(channel,self.output_H*self.output_W)
                 #活性化関数
                 self.activate_func=activate_func
                 self.learning_rate=learning_rate
@@ -137,11 +149,13 @@ class Layer():
                 self.output=np.zeros((channel,self.output_H,self.output_W))
                 self.error=np.zeros(self.x.shape)
                 self.st=st
+                self.gen_mat=np.zeros(self.x.shape[-3]*self.output_H*self.output_W*self.kernel_size_W*self.kernel_size_H).reshape(self.output_W*self.output_H,self.kernel_size_W*self.kernel_size_H,self.x.shape[-3])
                 self.h=np.zeros((channel,self.output_H,self.output_W))
+                self.y=np.zeros((channel,self.output_H,self.output_W))
             else:
                 print("色々おかしいCNN")
         #出力後のデータの形を返す
-        def output_data_size(self):
+        def output_data(self):
             return self.output
         #重みを返す
         def output_weight(self):
@@ -156,94 +170,67 @@ class Layer():
             self.bias_w=bw
         #前方方向の計算    
         def forward(self,x):
+            #入力データを３次元にする
             while(x.ndim<3):
                 x=x[np.newaxis]
-            #プログラミングの挙動の為にxの次元数を見てる
-            if x.ndim==3:
-                #xのchannelの数だけ処理
-                for d in range(x.shape[-3]):
-                    #出力のchannelの数だけ処理
-                    for c in range(self.channel):
-                        #convはたたみ込みをまだするかどうか
-                        conv=True
-                        #xの何処を処理するかを決めるためのaとb
-                        a=0
-                        b=0
-                        while(conv):
-                            #hはたたみ込みの値
-                            h=0
-                            #カーネルの数だけ処理していく
-                            for i in range(self.weight.shape[-2]):
-                                for j in range(self.weight.shape[-1]):
-                                    #カーネルの中の重みとデータをかけ算
-                                    h=h+x[d][i+a][j+b]*self.weight[c][d][i][j]
-                                    self.h[c][int(a/self.st)][int(b/self.st)]=h
-                            #活性化関数を通す
-                            y=self.activate_func.func(h+self.bias_w[c][int(a/self.st)][int(b/self.st)])
-                            #出力結果に保存
-                            self.output[c][int(a/self.st)][int(b/self.st)]=y
-                            #データの位置を動かしていく
-                            a+=self.st
-                            #aが出力結果の形を超える時にbを動かしてaを0にする
-                            if a==self.output_H*self.st:
-                                b+=self.st
-                                a=0
-                                #データがそのchannelで全て畳み込みしたら畳み込みを止める。
-                                if b==self.output_W*self.st:
-                                    a=0
-                                    b=0
-                                    conv=False
-                return self.output
+            #畳み込みをするために入力データの形を変えていく
+            #重みとgen_matの内積をhhとする
+            hh=np.zeros(self.channel*self.output_H*self.output_W*self.x.shape[-3]).reshape(self.channel,self.output_H*self.output_W,self.x.shape[-3])
+            for d in range(self.x.shape[-3]):
+                for h in range(self.output_H):
+                    for w in range(self.output_W):
+                        for i in range(self.kernel_size_H):
+                            for j in range(self.kernel_size_W):
+                                self.gen_mat[w+h*self.output_W][i*self.kernel_size_W+j][d]=x[d][i+h*self.st][j+w*self.st]
+            #gen_matと重みの内積
+            for i in range(self.channel):
+                for j in range(self.output_H*self.output_W):
+                    for k in range(self.x.shape[-3]):
+                        hh[i][j][k]=(self.weight[i][k]@self.gen_mat[j][:,k])+self.bias_w[i][k]
+            #hhのデータの１次元データをまとめる(入力データのチャネルをまとめる)
+            bb=np.ones((1,self.x.shape[-3]))
+            self.h=hh@bb.T
+            #hhのデータを１次元にして活性化関数に入れる。
+            self.y=self.activate_func.func(self.h.ravel())
+            #データを出力特徴マップの形に変える
+            self.output=np.transpose(self.y.reshape(self.channel,self.output_H,self.output_W),(0,1,2))
+            return self.output
         def backward(self,forward_error):
             #一旦、、一次元に変える
-            forward_error=forward_error.ravel()
-            hh=self.h.ravel()
             #活性化関数と受け取った誤差をかけて適切な誤差にかえる
-            for i in range(len(forward_error)):
-                forward_error[i]=forward_error[i]*self.activate_func.dif(hh[i])
             #1次元配列なので3次元配列に変える。
-            forward_error=forward_error.reshape(self.output.shape)
+            forward_error=(forward_error.ravel()*self.activate_func.dif(self.h.ravel())).reshape(self.output.shape)
             #次の層に渡す誤差の0行列
             self.error=np.zeros(self.x.shape)
-            #重みのカーネルの数だけ処理
-            for c in range(self.channel):
-                #xのchannelの数だけ処理
-                for d in range(self.x.shape[-3]):
-                    #convはたたみ込みをまだするかどうか
-                    conv=True
-                    #xの何処を処理するかを決めるためのaとb
-                    a=0
-                    b=0
-                    while(conv):
-                        #カーネルの数だけ処理していく
-                        for i in range(self.weight.shape[-2]):
-                            for j in range(self.weight.shape[-1]):
-                                #重みを修正していく
-                                self.weight[c][d][i][j]=self.weight[c][d][i][j]-self.learning_rate*forward_error[c][int(a/self.st)][int(b/self.st)]*self.x[d][i+a][j+b]
-                                self.bias_w[c][i][j]=self.bias_w[c][i][j]-self.learning_rate*forward_error[c][int(a/self.st)][int(b/self.st)]/self.x.shape[-3]
-                                #次の層に渡す誤差を求める。
-                                self.error[d][i+a][j+b]=self.error[d][i+a][j+b]+forward_error[c][int(a/self.st)][int(b/self.st)]*self.weight[c][d][i][j]
-                                print(self.error)
-                        #データの位置を動かしていく
-                        a+=self.st
-                        #aが出力結果の形を超える時にbを動かしてaを0にする
-                        if a==self.output_H*self.st:
-                            b+=self.st
-                            a=0
-                            #データがそのchannelで全て畳み込みしたら畳み込みを止める。
-                            if b==self.output_W*self.st:
-                                a=0
-                                b=0
-                                conv=False
+            for i in range(self.channel):
+                for j in range(self.x.shape[-3]):
+                    for k in range(self.output_H):
+                        for l in range(self.output_W):
+                            print(l+k*self.output_W)
+                            print("weight")
+                            print(self.weight)
+                            print(self.weight[i][j])
+                            print("forwarder")
+                            print(self.output)
+                            print(forward_error)
+                            print(forward_error[i][k][l])
+                            print("gen_mat")
+                            print(self.gen_mat)
+                            print(self.gen_mat[:][j][:,l+k*self.output_W])
+                            print("inner")
+                            print(np.array([forward_error[i][k][l]]).T@np.array([self.gen_mat[:][j][:,l+k*self.output_W]]))
+                            self.weight[i][j]=self.weight[i][j]-self.learning_rate*np.array([forward_error[i][k][l]]).T@np.array([self.gen_mat[:][j][:,l+k*self.output_W]])
+
             return self.error
     #プーリング層(入力データ,kernelの高さ,kernelの横,stride,"max" or "avarage"のどちらかのモード)
     class Pooling():
-        def __init__(self,x,kernel_size_H,kernel_size_W,st=1,mode="max"):
+        def __init__(self,x,kernel_size_H,kernel_size_W,l,st=1,mode="max"):
             while(x.ndim<3):
                 x=x[np.newaxis]
             self.x=x
             #strideとデータとカーネルの都合がいいとたたみ込み可能
-            if isinstance((x.shape[-2]-kernel_size_H)/st) and isinstance((x.shape[-1]-kernel_size_W)/st):
+            if is_integer_num((x.shape[-2]-kernel_size_H)/st) and is_integer_num((x.shape[-1]-kernel_size_W)/st):
+
                 #最終的に出力の形を求める(output_H,output_W,channel)
                 self.output_H=int(1+(x.shape[-2]-kernel_size_H)/st)
                 self.output_W=int(1+(x.shape[-1]-kernel_size_W)/st)
@@ -259,7 +246,7 @@ class Layer():
             else:
                 print("色々おかしいpooling")   
         #出力後のデータの形を返す
-        def output_data_size(self):
+        def output_data(self):
             return self.output  
         #重みを返す
         def output_weight(self):
@@ -268,57 +255,80 @@ class Layer():
         def output_error(self):
             return self.error
         def forward(self,x):
-                while(x.ndim<3):
-                    x=x[np.newaxis]
-                self.x=x
-                #xのchannelの数だけ処理
-                self.weight=np.zeros((self.x.shape[-3],self.x.shape[-2],self.x.shape[-1]))
-                for d in range(self.x.shape[-3]):
-                    #convはたたみ込みをまだするかどうか
-                    pool=True
-                    #xの何処を処理するかを決めるためのaとb
-                    a=0
-                    b=0
-                    while(pool):
-                        value=0
-                        #カーネルの数だけ処理していく
+            while(x.ndim<3):
+                x=x[np.newaxis]
+            gen_mat=np.zeros(self.channel*self.output_H*self.output_W*self.kernel_size_W*self.kernel_size_H).reshape(self.channel,self.output_W*self.output_H,self.kernel_size_W*self.kernel_size_H)
+            self.weight=np.zeros(self.channel*self.output_H*self.output_W*self.kernel_size_W*self.kernel_size_H).reshape(self.channel,self.output_W*self.output_H,self.kernel_size_W*self.kernel_size_H)
+            for d in range(self.channel):
+                for h in range(self.output_H):
+                    for w in range(self.output_W):
+                        min_v=np.inf()
+                        min_d=d
+                        min_h=w+h*self.output_H
+                        min_w=0   
                         for i in range(self.kernel_size_H):
                             for j in range(self.kernel_size_W):
-                                if self.mode=="max":
-                                    #とりあえず最初のユニットを最大にしておく
-                                    if i==0 and j==0:
+                                if min_v>x[d][i+h*self.st][j+w*self.st]:
+                                    gen_mat[d][min_h][min_w]=0
+                                    gen_mat[d][w+h*self.output_H][i*self.kernel_size_H+j]=x[d][i+h*self.st][j+w*self.st]
+                                    self.weight[min_d][min_h][min_w]=0
+                                    self.weight[d][w+h*self.output_H][i*self.kernel_size_H+j]=1
+                                    min_d=d                               
+                                    min_h=w+h*self.output_H
+                                    min_w=i*self.kernel_size_H+j
+            self.output=np.transpose(gen_mat.reshape(self.channel,self.x[-3],self.output_H,self.output_W),(1,0,2,3))
+
+            while(x.ndim<3):
+                x=x[np.newaxis]
+            self.x=x
+            #xのchannelの数だけ処理
+            self.weight=np.zeros((self.x.shape[-3],self.x.shape[-2],self.x.shape[-1]))
+            for d in range(self.x.shape[-3]):
+                #convはたたみ込みをまだするかどうか
+                pool=True
+                #xの何処を処理するかを決めるためのaとb
+                a=0
+                b=0
+                while(pool):
+                    value=0
+                    #カーネルの数だけ処理していく
+                    for i in range(self.kernel_size_H):
+                        for j in range(self.kernel_size_W):
+                            if self.mode=="max":
+                                #とりあえず最初のユニットを最大にしておく
+                                if i==0 and j==0:
+                                    value=self.x[d][i+a][j+b]
+                                    self.weight[d][i+a][j+b]=1                                        
+                                    #カーネル内の他のユニットを見ていく。
+                                else:
+                                    #他に最大の物が見つかった時                                            
+                                    if value<self.x[d][i+a][j+b]:
                                         value=self.x[d][i+a][j+b]
-                                        self.weight[d][i+a][j+b]=1                                        
-                                        #カーネル内の他のユニットを見ていく。
-                                    else:
-                                        #他に最大の物が見つかった時                                            
-                                        if value<self.x[d][i+a][j+b]:
-                                            value=self.x[d][i+a][j+b]
-                                            #誤差逆伝搬の為にそのカーネル内にある重みを一旦0に書き換えて、新しく1を置く
-                                            for k in range(self.kernel_size_H):
-                                                for l in range(self.kernel_size_W):
-                                                    self.weight[d][k+a][l+b]=0
-                                            self.weight[d][i+a][j+b]=1
-                                #平均プーリング
-                                if self.mode=="average":
-                                    value=value+self.x[d][i+a][j+b]
-                                    self.weight[d][i+a][j+b]=1/(self.kernel_size_H*self.kernel_size_W)
+                                        #誤差逆伝搬の為にそのカーネル内にある重みを一旦0に書き換えて、新しく1を置く
+                                        for k in range(self.kernel_size_H):
+                                            for l in range(self.kernel_size_W):
+                                                self.weight[d][k+a][l+b]=0
+                                        self.weight[d][i+a][j+b]=1
+                            #平均プーリング
                             if self.mode=="average":
-                                value=value/(self.kernel_size_H*self.kernel_size_W)
-                            #出力結果に保存
-                            self.output[d][int(a/self.st)][int(b/self.st)]=value
-                        #データの位置を動かしていく
-                        a+=self.st
-                        #aが出力結果の形を超える時にbを動かしてaを0にする
-                        if a==self.output_H*self.st:
-                            b+=self.st
+                                value=value+self.x[d][i+a][j+b]
+                                self.weight[d][i+a][j+b]=1/(self.kernel_size_H*self.kernel_size_W)
+                        if self.mode=="average":
+                            value=value/(self.kernel_size_H*self.kernel_size_W)
+                        #出力結果に保存
+                        self.output[d][int(a/self.st)][int(b/self.st)]=value
+                    #データの位置を動かしていく
+                    a+=self.st
+                    #aが出力結果の形を超える時にbを動かしてaを0にする
+                    if a==self.output_H*self.st:
+                        b+=self.st
+                        a=0
+                        #データがそのchannelで全て畳み込みしたら畳み込みを止める。
+                        if b==self.output_W*self.st:
                             a=0
-                            #データがそのchannelで全て畳み込みしたら畳み込みを止める。
-                            if b==self.output_W*self.st:
-                                a=0
-                                b=0
-                                pool=False
-                return self.output
+                            b=0
+                            pool=False
+            return self.output
         def backward(self,forward_error):
                 #前方向の誤差が1次元配列とかなら3次元配列に変える。
                 forward_error=forward_error.reshape(self.output.shape)
