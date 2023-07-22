@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+<title>codモバイル武器ランダム</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<h1>codモバイル武器ランダム</h1>
+<div id="test"></div>
+<input id="copyTarget" type="text" value="武器" readonly>
+<button onclick="copyToClipboard()">Copy 
+<script>
+
+main_weapon=["Type 25","M16","AK117","AK-47"];
+//EM2まで
+weapon_parts_num=["9","9","9","9","9","9","9","9","9","9","9","9","9","9","9","9","8","9","9","9","9","9","9","9"];
+
+//AK117のバレルYKMを除いていたりする。
+weapon_parts_char=[[6,3,18,3,8,3,5,3,5],[6,3,18,4,9,3,5,2,3],[7,3,18,4,8,3,6,2,3],[6,4,18,5,8,3,5,3,3],[6,4,18,4,8,3,5,2,3],[6,4,18,4,8,3,6,2,3],
+                    [7,3,18,3,8,3,6,3,3],[6,2,18,4,8,3,5,2,3],[7,2,18,4,8,3,5,3,3],[7,3,18,3,8,3,5,2,3],[7,3,18,4,8,3,5,2,3],[7,3,18,5,8,3,5,2,3],
+                    [6,2,18,3,8,3,5,3,3],[7,3,18,4,8,3,5,4,3],[6,4,18,4,8,3,5,2,3],[6,3,18,3,8,3,6,2,3],[3,18,4,7,3,6,3,3],[6,3,18,6,8,3,6,2,3],
+                    [6,2,18,4,8,3,5,4,3],[6,3,18,3,8,3,6,3,3],[6,2,18,4,8,3,6,3,3],[7,3,18,3,8,3,5,4,3],[5,6,18,6,8,3,6,6,3],
+                    //EM2
+                    [6,3,18,3,8,3,6,3,3]]
+                    //[,,18,,,3,,3],[,,18,,,3,,3],[,,18,,,3,,3],];
+function random_weapon(){
+    //まずるなどの数値とその中の英文字
+    num_parts=[1,2,3,4,5,6,7,8,9,10];
+    char_parts=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+    new_weapon=[];
+    new_num_parts=[];
+    new_char_parts=[];
+
+    mw=Math.floor(Math.random()*main_weapon.length);
+   
+    while(true){
+      if(num_parts[num_parts.length-1]==weapon_parts_num[mw]){
+        break;
+      }
+      num_parts.pop()
+    }
+    for(var i=0;i<5;i++){
+      a=Math.floor(Math.random()*num_parts.length);
+      new_num_parts.push(num_parts[a]);
+      num_parts.splice(a,1);
+    }
+    //種類完成
+    nnp=new_num_parts.sort()
+    for(var i=0;i<5;i++){
+      new_char_parts.push(char_parts[Math.floor(Math.random()*weapon_parts_char[mw][nnp[i]-1])]);
+    }
+    new_weapon.push(main_weapon[mw])
+    new_weapon.push("-")
+    for(var i=0;i<5;i++){
+      new_weapon.push(new_num_parts[i]);
+      new_weapon.push(new_char_parts[i]);
+    }
+    return new_weapon.join("")
+}
+function copyToClipboard() {
+// コピー対象をJavaScript上で変数として定義する
+var copyTarget = document.getElementById("copyTarget");
+// コピー対象のテキストを選択する
+copyTarget.select();
+// 選択しているテキストをクリップボードにコピーする
+document.execCommand("Copy");
+// コピーをお知らせする
+alert("コピーできました！ : " + copyTarget.value);
+}
+
+addEventListener('load', function(e) {
+  document.querySelector('#copyTarget').value = random_weapon();
+});
+
+
+
+</script>
+</body>
+</html>
