@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <title>チーム決め</title>
+</head>
+<body>
+  <h1>チーム決め</h1>
+<fieldset>
+<legend>メンバー</legend>
+<input type="text" id="player0">
+<input type="text" id="player1">
+<BR>
+<input type="text" id="player2">
+<input type="text" id="player3">
+<BR>
+<input type="text" id="player4">
+<input type="text" id="player5">
+<BR>
+<input type="text" id="player6">
+<input type="text" id="player7">
+<BR>
+<input type="text" id="player8">
+<input type="text" id="player9">
+</fieldset>
+<BR>
+<input id="aaa" onclick="team_up();" type="button" value="チーム替え" />
+<BR>
+<BR>
+<fieldset>
+<legend>チーム替え後</legend>
+<input type="text" id="player00">
+<input type="text" id="player01">
+<BR>
+<input type="text" id="player02">
+<input type="text" id="player03">
+<BR>
+<input type="text" id="player04">
+<input type="text" id="player05">
+<BR>
+<input type="text" id="player06">
+<input type="text" id="player07">
+<BR>
+<input type="text" id="player08">
+<input type="text" id="player09">
+</fieldset>
+  <script>
+function team_up(){
+
+var team=[];
+var new_team=[];
+
+for(var i=0;i<10;i++){
+pl="player"+i;
+player=document.getElementById(pl);
+if(player.value!=""){
+team.push(player.value);
+}}
+
+while(team.length>0){
+a=Math.floor(Math.random()*team.length);
+new_team.push(team[a]);
+team.splice(a,1);
+}
+
+while(new_team.length<10){
+new_team.push("");
+}
+
+for(var i=0;i<10;i++){
+pl="player0"+i
+player=document.getElementById(pl);
+player.value=new_team[i];
+}
+
+}
+</script>
+</body>
+</html>
