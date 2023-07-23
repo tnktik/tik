@@ -8,26 +8,63 @@
 </head>
 <body>
 <h1>codモバイル武器ランダム</h1>
-<div id="test"></div>
-<input id="copyTarget" type="text" value="武器" readonly>
-<button onclick="copyToClipboard()">Copy 
-<script>
+<button onclick="make_weapon()">作成</button>
+<BR>
+<input id="copyTarget" type="text" value="武器">
+<button onclick="copyToClipboard()">コピー</button>
+<BR>
+<fieldset>
+<legend>武器</legend>
+<input type="checkbox" name="W" value="0" checked>AR
+<BR>
+<input type="checkbox" name="W" value="1" checked>SR
+<BR>
+<input type="checkbox" name="W" value="2" checked>SMG
+<BR>
+<input type="checkbox" name="W" value="3" disabled>LMG
+<BR>
+<input type="checkbox" name="W" value="4" disabled>SG
+<BR>
+<input type="checkbox" name="W" value="5" disabled>MR
+</fieldset>
 
-main_weapon=["Type 25","M16","AK117","AK-47","ASM10","M4","BK57","LK24","ICR-1","Man-O-War","KN-44","HBRa3","HVK-30","DR-H","Peacekeaper MK2","FR .556","AS VAL","CR-56 AMAX","M13","Swordfish","Kilo 141","Oden","Krig 6","EM2","Maddox","FFAR 1","Grau 5.56"]
-//EM2まで
-weapon_parts_num=["9","9","9","9","9","9","9","9","9","9","9","9","9","9","9","9","8","9","9","9","9","9","9","9","7","9","9"];
+
+
+
+<script>
+const weapons=[["Type 25","M16","AK117","AK-47","ASM10","M4","BK57","LK24","ICR-1","Man-O-War","KN-44","HBRa3","HVK-30","DR-H","Peacekeaper MK2","FR .556","AS VAL","CR-56 AMAX","M13","Swordfish","Kilo 141","Oden","Krig 6","EM2","Maddox","FFAR 1","Grau 5.56"],
+              ["XPR-50","Arctic .50","M21 EBR","DL Q33","Locus","NA-45","Outlaw","Rytec AMR","SVD","Koshka","ZRG 20mm","HDR"],
+              ["RUS-79U","Chicom","PDW-57","Razorback","MSMC","HG 40","Pharo","GKS","Cordite","QQ9","Fennec","AGR 556","QXR","PP19 Bizon","MX9","CBR4","PPSh-41","MAC-10","KSP 45","Switchblade X9","LAPA","OTs 9"]];
 
 //AK117のバレルYKMを除いていたりする。
-weapon_parts_char=[[6,3,18,3,8,3,5,3,5],[6,3,18,4,9,3,5,2,3],[7,3,18,4,8,3,6,2,3],[6,4,18,5,8,3,5,3,3],[6,4,18,4,8,3,5,2,3],[6,4,18,4,8,3,6,2,3],
+const weapon_parts_char=[[[6,3,18,3,8,3,5,3,5],[6,3,18,4,9,3,5,2,3],[7,3,18,4,8,3,6,2,3],[6,4,18,5,8,3,5,3,3],[6,4,18,4,8,3,5,2,3],[6,4,18,4,8,3,6,2,3],
                     [7,3,18,3,8,3,6,3,3],[6,2,18,4,8,3,5,2,3],[7,2,18,4,8,3,5,3,3],[7,3,18,3,8,3,5,2,3],[7,3,18,4,8,3,5,2,3],[7,3,18,5,8,3,5,2,3],
                     [6,2,18,3,8,3,5,3,3],[7,3,18,4,8,3,5,4,3],[6,4,18,4,8,3,5,2,3],[6,3,18,3,8,3,6,2,3],[3,18,4,7,3,6,3,3],[6,3,18,6,8,3,6,2,3],
                     [6,2,18,4,8,3,5,4,3],[6,3,18,3,8,3,6,3,3],[6,2,18,4,8,3,6,3,3],[7,3,18,3,8,3,5,4,3],[5,6,18,6,8,3,6,6,3],
                     //EM2
                     [6,3,18,3,8,3,6,3,3],[5,18,4,8,3,6,4],
                     //FFAR
-                    [6,6,18,6,8,3,6,6,6],[6,5,18,3,8,3,5,2,3]]
-                    //[,,18,,,3,,3],[,,18,,,3,,3],[,,18,,,3,,3],];
+                    [6,6,18,6,8,3,6,6,6],[6,5,18,3,8,3,5,2,3]],
+                    //スナイパー
+                    [[6,3,7,3,8,1,6,3],[6,4,7,3,7,1,3,3],[6,3,7,4,7,1,2],[6,3,7,4,7,1,1,3],[6,3,7,3,7,1,3,3],[5,3,7,3,6,1,8,3],[6,3,7,5,9,1,1,2,3],[6,3,7,3,7,1,1,2,3],[6,2,7,3,7,1,1,2],[6,2,7,3,7,2,3,3],[6,3,7,3,7,1,1,3,4],[6,3,7,4,8,1,1,2]],
+                    //SMG
+                    [[6,3,15,4,8,4,5,3,3],[6,3,15,3,8,3,6,3,2],[6,2,15,3,8,3,4,3],[6,2,15,3,8,3,4,3,1],[6,3,15,4,8,3,5,3,3],[6,2,15,5,8,3,5,3,3],[6,3,15,3,8,3,7,3,3],[6,2,15,3,8,3,5,3,3],[6,2,15,3,8,3,4,2,3],[6,3,15,4,7,3,5,3,3],
+                    //fennec
+                    [6,3,15,4,8,5,5,3,3],[6,3,15,3,8,3,5,3,3],[6,3,15,4,9,3,5,2,3],[6,3,15,4,8,3,2,3],[6,2,15,4,7,3,5,2,3],[6,2,15,3,8,3,3,3],[6,3,15,3,8,3,5,2,3],[6,5,15,4,7,3,6,4,3],[6,4,15,4,7,3,6,2,3],[6,3,15,3,9,3,5,2,3],[6,5,15,6,7,3,6,6,3],[6,6,15,6,7,3,6,5,3]]]
+                   
 function random_weapon(){
+  main_weapon=[]
+  weapon_parts=[]
+   //チェックボックスで色々する。
+   var WT=document.getElementsByName("W");
+  for(var i=0;i<weapons.length;i++){
+    if(WT[i].checked==true){
+      main_weapon.push(weapons[i]);
+      weapon_parts.push(weapon_parts_char[i])
+    }
+  }
+main_weapon.join("");
+weapon_parts.join("");
     //まずるなどの数値とその中の英文字
     num_parts=[1,2,3,4,5,6,7,8,9,10];
     char_parts=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
@@ -35,30 +72,37 @@ function random_weapon(){
     new_num_parts=[];
     new_char_parts=[];
 
-    mw=Math.floor(Math.random()*main_weapon.length);
-   
+    //武器の種類を決める(AR、SR、SMGなど)
+    weapon_type=Math.floor(Math.random()*main_weapon.length);
+    //上で決めたカテゴリーのなかで武器を決める(AK117など)
+    weapon_name=Math.floor(Math.random()*main_weapon[weapon_type].length);
+   //ガンスミスの種類を取得する
     while(true){
-      if(num_parts[num_parts.length-1]==weapon_parts_num[mw]){
+      if(num_parts[num_parts.length-1]==weapon_parts_char[weapon_type][weapon_name].length){
         break;
       }
       num_parts.pop()
     }
+    //ランダムにガンスミスの種類をきめる
     for(var i=0;i<5;i++){
       a=Math.floor(Math.random()*num_parts.length);
       new_num_parts.push(num_parts[a]);
       num_parts.splice(a,1);
     }
-    //種類完成
+    //以下で数値の小さい順にソートする
     nnp=new_num_parts.sort()
+    //上で決めた種類に対して詳しくどれかのパーツを決める(粒状グリップテープやOWCマークスマンなど)
     for(var i=0;i<5;i++){
-      new_char_parts.push(char_parts[Math.floor(Math.random()*weapon_parts_char[mw][nnp[i]-1])]);
+      new_char_parts.push(char_parts[Math.floor(Math.random()*weapon_parts_char[weapon_type][weapon_name][nnp[i]-1])]);
     }
-    new_weapon.push(main_weapon[mw])
+    //以下はアタッチメントコードの文字列を取得するために配列に格納していく
+    new_weapon.push(main_weapon[weapon_type][weapon_name])
     new_weapon.push("-")
     for(var i=0;i<5;i++){
       new_weapon.push(new_num_parts[i]);
       new_weapon.push(new_char_parts[i]);
     }
+    //配列の要素をくっつけて文字列を返す
     return new_weapon.join("")
 }
 function copyToClipboard() {
@@ -70,6 +114,10 @@ copyTarget.select();
 document.execCommand("Copy");
 // コピーをお知らせする
 alert("コピーできました！ : " + copyTarget.value);
+}
+//更新
+function make_weapon(){
+  document.querySelector('#copyTarget').value = random_weapon();
 }
 
 addEventListener('load', function(e) {
