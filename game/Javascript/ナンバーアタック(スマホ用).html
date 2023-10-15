@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <title>ナンバーアタック</title>
+</head>
+<body>
+<canvas id="display" width="600" height="800"></canvas>
+<h2>タイム:<span id="score"></span> 次の数字:<span id="count"></span><h2>
+  1位:<span id="rank0"></span>
+    2位:<span id="rank1"></span>
+    3位:<span id="rank2"></span>
+    4位:<span id="rank3"></span>
+    5位:<span id="rank4"></span>
+  <script>
+var number=["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30"];
+var ranking=[0,0,0,0,0];
+var deck=[""];
+var dx=[];
+var dy=[];
+var xx=0;
+var yy=100;
+var display=document.getElementById("display");
+var score=0;
+var tx;
+var ty;
+var ctx;
+var count=1;
+var width=600;
+var height=900;
+window.addEventListener('load', function(e) {
+strrank=localStorage.getItem("strrank"); 
+ranking=strrank.split(",");
+ctx = display.getContext('2d');
+document.querySelector('#count').innerHTML = count.toFixed(0);
+document.querySelector('#rank0').innerHTML = ranking[0];
+document.querySelector('#rank1').innerHTML = ranking[1];
+document.querySelector('#rank2').innerHTML = ranking[2];
+document.querySelector('#rank3').innerHTML = ranking[3];
+document.querySelector('#rank4').innerHTML = ranking[4];
+for(var i=0;i<31;i++){
+random=Math.floor(Math.random()*number.length);
+deck.push(number[random]);
+number.splice(random,1)
+dx.push(xx);
+dy.push(yy);
+xx+=100;
+if(xx>505){
+xx=0;
+yy+=100;
+}
+}
+
+setInterval(timer,100);
+setInterval(draw,100);
+}, false);
+function timer(){
+score+=0.1;
+document.querySelector('#score').innerHTML = score.toFixed(1);
+}
+
+display.addEventListener('touchstart',function(e){ 
+e.preventDefault();
+tx=e.changedTouches[0].pageX;
+ty=e.changedTouches[0].pageY;
+xx=0;
+yy=0;
+for(var i=0;i<31;i++){
+xx+=100;
+if(xx>505){
+xx=0;
+yy+=100;
+}
+if(tx<dx[i]+100&&tx>dx[i]&&ty<dy[i]&&ty>dy[i]-100&&count==deck[i]){
+count++;
+document.querySelector('#count').innerHTML = count.toFixed(0);
+if(count>=31){
+alert(score.toFixed(1));
+score=Math.floor(score*10);
+score=score/10;
+ranking.push(score);
+ranking.sort(shoujun); 
+strrank=ranking.toString();
+localStorage.strrank=strrank;
+ranking.splice(5,1);
+}}
+}
+
+}, false); 
+function draw(){
+ctx.globalCompositeOperation = "source-over";
+for(var i=0;i<31;i++){
+ctx.beginPath();
+ctx.font = "75px'ゴシック'";
+ctx.fillText(deck[i],dx[i],dy[i],50);
+ctx.closePath();
+}
+
+    ctx.globalCompositeOperation = "lighter";
+
+}
+function shoujun(a,b){
+return b+a;
+}
+
+
+
+
+</script>
+</body>
+</html>

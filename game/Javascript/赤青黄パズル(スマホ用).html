@@ -1,0 +1,760 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <title>パズル</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <script src="script.js"></script>
+<BR>
+全て黄色にしろ<BR> 
+<BR>
+<canvas id="verta" height="100" width="100"></canvas>   
+<canvas id="vertb" height="100" width="100"></canvas>
+<canvas id="vertc" height="100" width="100"></canvas><BR>
+<canvas id="vertd" height="100" width="100"></canvas>
+<canvas id="verte" height="100" width="100"></canvas>   
+<canvas id="vertf" height="100" width="100"></canvas><BR>
+<canvas id="vertg" height="100" width="100"></canvas>
+<canvas id="verth" height="100" width="100"></canvas>
+<canvas id="verti" height="100" width="100"></canvas>
+  <script src="script.js"></script>
+<script type="text/javascript">
+var pazurua=13;
+var count=0;
+var toua = document.getElementById('verta');
+var toub = document.getElementById('vertb');
+var touc = document.getElementById('vertc');
+var toud = document.getElementById('vertd');
+var toue = document.getElementById('verte');
+var touf = document.getElementById('vertf');
+var toug = document.getElementById('vertg');
+var touh = document.getElementById('verth'); 
+var toui = document.getElementById('verti');
+var acol=0;
+var bcol=0;
+var ccol=0;
+var dcol=0;
+var ecol=0;
+var fcol=0;
+var gcol=0;
+var hcol=0;
+var icol=0;
+var ac;
+var bc;
+var cc;
+var dc;
+var ec;
+var fc;
+var gc;
+var hc;
+var ic;
+var que2=1;
+function pass2(){
+
+}
+
+toua.addEventListener('touchstart', function (event) {
+if(que2==1){
+  event.preventDefault();     
+switch(acol){
+case 0:
+ac="red";
+acol=1;
+break;
+case 1:
+ac="blue";
+acol=2;
+break;
+default:
+ac="yellow";
+acol=0;
+break;
+}
+switch(bcol){
+case 0:
+bc="red";
+bcol=1;
+break;
+case 1:
+bc="blue";
+bcol=2;
+break;
+default:
+bc="yellow";
+bcol=0;
+break;
+}
+switch(dcol){
+case 0:
+dc="red";
+dcol=1;
+break;
+case 1:
+dc="blue";
+dcol=2;
+break;
+default:
+dc="yellow";
+dcol=0;
+break;
+}
+cta=toua.getContext('2d');
+cta.fillStyle=ac;
+cta.fillRect(0,0,100,100);　
+ctb=toub.getContext('2d');
+ctb.fillStyle=bc;
+ctb.fillRect(0,0,100,100);
+ctd=toud.getContext('2d');
+ctd.fillStyle=dc;
+ctd.fillRect(0,0,100,100);　
+end2();
+}
+},false);
+toub.addEventListener('touchstart', function (event) {
+if(que2==0){
+alert("パスワードを入れてください");
+}
+if(que2==1){
+  event.preventDefault();    
+switch(acol){
+case 0:
+ac="red";
+acol=1;
+break;
+case 1:
+ac="blue";
+acol=2;
+break;
+default:
+ac="yellow";
+acol=0;
+break;
+}
+switch(bcol){
+case 0:
+bc="red";
+bcol=1;
+break;
+case 1:
+bc="blue";
+bcol=2;
+break;
+default:
+bc="yellow";
+bcol=0;
+break;
+}
+switch(ccol){
+case 0:
+cc="red";
+ccol=1;
+break;
+case 1:
+cc="blue";
+ccol=2;
+break;
+default:
+cc="yellow";
+ccol=0;
+break;
+}
+switch(ecol){
+case 0:
+ec="red";
+ecol=1;
+break;
+case 1:
+ec="blue";
+ecol=2;
+break;
+default:
+ec="yellow";
+ecol=0;
+break;
+}
+cta=toua.getContext('2d');
+cta.fillStyle=ac;
+cta.fillRect(0,0,100,100);
+ctb=toub.getContext('2d');
+ctb.fillStyle=bc;
+ctb.fillRect(0,0,100,100);
+ctc=touc.getContext('2d');
+ctc.fillStyle=cc;
+ctc.fillRect(0,0,100,100);　
+cte=toue.getContext('2d');
+cte.fillStyle=ec;
+cte.fillRect(0,0,100,100);
+end2();
+}
+},false);
+
+touc.addEventListener('touchstart', function (event) {
+if(que2==0){
+alert("パスワードを入れてください");
+}
+if(que2==1){
+  event.preventDefault();    
+switch(bcol){
+case 0:
+bc="red";
+bcol=1;
+break;
+case 1:
+bc="blue";
+bcol=2;
+break;
+default:
+bc="yellow";
+bcol=0;
+break;
+}
+switch(ccol){
+case 0:
+cc="red";
+ccol=1;
+break;
+case 1:
+cc="blue";
+ccol=2;
+break;
+default:
+cc="yellow";
+ccol=0;
+break;
+}
+switch(fcol){
+case 0:
+fc="red";
+fcol=1;
+break;
+case 1:
+fc="blue";
+fcol=2;
+break;
+default:
+fc="yellow";
+fcol=0;
+break;
+}　
+ctb=toub.getContext('2d');
+ctb.fillStyle=bc;
+ctb.fillRect(0,0,100,100);
+ctc=touc.getContext('2d');
+ctc.fillStyle=cc;
+ctc.fillRect(0,0,100,100);
+ctf=touf.getContext('2d');
+ctf.fillStyle=fc;
+ctf.fillRect(0,0,100,100);
+end2();
+}
+},false);
+
+toud.addEventListener('touchstart', function (event) {
+if(que2==0){
+alert("パスワードを入れてください");
+}
+if(que2==1){
+  switch(acol){
+case 0:
+ac="red";
+acol=1;
+break;
+case 1:
+ac="blue";
+acol=2;
+break;
+default:
+ac="yellow";
+acol=0;
+break;
+}
+switch(dcol){
+case 0:
+dc="red";
+dcol=1;
+break;
+case 1:
+dc="blue";
+dcol=2;
+break;
+default:
+dc="yellow";
+dcol=0;
+break;
+}
+switch(ecol){
+case 0:
+ec="red";
+ecol=1;
+break;
+case 1:
+ec="blue";
+ecol=2;
+break;
+default:
+ec="yellow";
+ecol=0;
+break;
+}
+switch(gcol){
+case 0:
+gc="red";
+gcol=1;
+break;
+case 1:
+gc="blue";
+gcol=2;
+break;
+default:
+gc="yellow";
+gcol=0;
+break;
+}
+cta=toua.getContext('2d');
+cta.fillStyle=ac;
+cta.fillRect(0,0,100,100);
+ctd=toud.getContext('2d');
+ctd.fillStyle=dc;
+ctd.fillRect(0,0,100,100);
+cte=toue.getContext('2d');
+cte.fillStyle=ec;
+cte.fillRect(0,0,100,100);
+ctg=toug.getContext('2d');
+ctg.fillStyle=gc;
+ctg.fillRect(0,0,100,100);
+end2();
+}
+},false);
+
+toue.addEventListener('touchstart', function (event) {
+if(que2==0){
+alert("パスワードを入れてください");
+}
+if(que2==1){
+  event.preventDefault();    
+switch(bcol){
+case 0:
+bc="red";
+bcol=1;
+break;
+case 1:
+bc="blue";
+bcol=2;
+break;
+default:
+bc="yellow";
+bcol=0;
+break;
+}
+switch(dcol){
+case 0:
+dc="red";
+dcol=1;
+break;
+case 1:
+dc="blue";
+dcol=2;
+break;
+default:
+dc="yellow";
+dcol=0;
+break;
+}
+switch(ecol){
+case 0:
+ec="red";
+ecol=1;
+break;
+case 1:
+ec="blue";
+ecol=2;
+break;
+default:
+ec="yellow";
+ecol=0;
+break;
+}
+switch(fcol){
+case 0:
+fc="red";
+fcol=1;
+break;
+case 1:
+fc="blue";
+fcol=2;
+break;
+default:
+fc="yellow";
+fcol=0;
+break;
+}
+switch(hcol){
+case 0:
+hc="red";
+hcol=1;
+break;
+case 1:
+hc="blue";
+hcol=2;
+break;
+default:
+hc="yellow";
+hcol=0;
+break;
+}
+ctb=toub.getContext('2d');
+ctb.fillStyle=bc;
+ctb.fillRect(0,0,100,100);
+ctd=toud.getContext('2d');
+ctd.fillStyle=dc;
+ctd.fillRect(0,0,100,100);
+cte=toue.getContext('2d');
+cte.fillStyle=ec;
+cte.fillRect(0,0,100,100);
+ctf=touf.getContext('2d');
+ctf.fillStyle=fc;
+ctf.fillRect(0,0,100,100);
+cth=touh.getContext('2d');
+cth.fillStyle=hc;
+cth.fillRect(0,0,100,100);
+end2();
+}
+},false);
+
+touf.addEventListener('touchstart', function (event) {
+if(que2==0){
+alert("パスワードを入れてください");
+}
+if(que2==1){
+  event.preventDefault();    
+switch(ccol){
+case 0:
+cc="red";
+ccol=1;
+break;
+case 1:
+cc="blue";
+ccol=2;
+break;
+default:
+cc="yellow";
+ccol=0;
+break;
+}
+switch(ecol){
+case 0:
+ec="red";
+ecol=1;
+break;
+case 1:
+ec="blue";
+ecol=2;
+break; 
+default:
+ec="yellow";
+ecol=0;
+break;
+}
+switch(fcol){
+case 0:
+fc="red";
+fcol=1;
+break;
+case 1:
+fc="blue";
+fcol=2;
+break;
+default:
+fc="yellow";
+fcol=0;
+break;
+}
+switch(icol){
+case 0:
+ic="red"
+icol=1;
+break;
+case 1:
+ic="blue"
+icol=2;
+break;
+default:
+ic="yellow";
+icol=0;
+break;
+}
+ctc=touc.getContext('2d');
+ctc.fillStyle=cc;
+ctc.fillRect(0,0,100,100);
+cte=toue.getContext('2d');
+cte.fillStyle=ec;
+cte.fillRect(0,0,100,100);
+ctf=touf.getContext('2d');
+ctf.fillStyle=fc;
+ctf.fillRect(0,0,100,100);
+cti=toui.getContext('2d');
+cti.fillStyle=ic;
+cti.fillRect(0,0,100,100);
+end2();
+}
+},false);
+
+
+
+toug.addEventListener('touchstart', function (event) {
+if(que2==0){
+alert("パスワードを入れてください");
+}
+if(que2==1){
+  event.preventDefault();    
+switch(dcol){
+case 0:
+dc="red";
+dcol=1;
+break;
+case 1:
+dc="blue";
+dcol=2;
+break;
+default:
+dc="yellow";
+dcol=0;
+break;
+}
+switch(gcol){
+case 0:
+gc="red";
+gcol=1;
+break;
+case 1:
+gc="blue";
+gcol=2;
+break;
+default:
+gc="yellow";
+gcol=0;
+break;
+}
+switch(hcol){
+case 0:
+hc="red";
+hcol=1;
+break;
+case 1:
+hc="blue";
+hcol=2;
+break;
+default:
+hc="yellow";
+hcol=0;
+break;
+}
+ctg=toug.getContext('2d');
+ctg.fillStyle=gc;
+ctg.fillRect(0,0,100,100);
+cth=touh.getContext('2d');
+cth.fillStyle=hc;
+cth.fillRect(0,0,100,100);
+ctd=toud.getContext('2d');
+ctd.fillStyle=dc;
+ctd.fillRect(0,0,100,100);
+end2();
+}
+},false);
+
+touh.addEventListener('touchstart', function (event) {
+if(que2==0){
+alert("パスワードを入れてください");
+}
+if(que2==1){
+  event.preventDefault();    　　　
+switch(ecol){
+case 0:
+ec="red";
+ecol=1;
+break;
+case 1:
+ec="blue";
+ecol=2;
+break;
+default:
+ec="yellow";
+ecol=0;
+break;
+}
+switch(gcol){
+case 0:
+gc="red";
+gcol=1;
+break;
+case 1:
+gc="blue";
+gcol=2;
+break;
+default:
+gc="yellow";
+gcol=0;
+break;
+}
+switch(hcol){
+case 0:
+hc="red";
+hcol=1;
+break;
+case 1:
+hc="blue";
+hcol=2;
+break;
+default:
+hc="yellow";
+hcol=0;
+break;
+}
+switch(icol){
+case 0:
+ic="red"
+icol=1;
+break;
+case 1:
+ic="blue"
+icol=2;
+break;
+default:
+ic="yellow";
+icol=0;
+break;
+}
+cte=toue.getContext('2d');
+cte.fillStyle=ec;
+cte.fillRect(0,0,100,100);
+ctg=toug.getContext('2d');
+ctg.fillStyle=gc;
+ctg.fillRect(0,0,100,100);
+cth=touh.getContext('2d');
+cth.fillStyle=hc;
+cth.fillRect(0,0,100,100);
+cti=toui.getContext('2d');
+cti.fillStyle=ic;
+cti.fillRect(0,0,100,100);
+end2();
+}
+},false);
+toui.addEventListener('touchstart', function (event) {
+if(que2==0){
+alert("パスワードを入れてください");
+}
+if(que2==1){
+  event.preventDefault();    
+switch(fcol){
+case 0:
+fc="red";
+fcol=1;
+break;
+case 1:
+fc="blue";
+fcol=2;
+break;
+default:
+fc="yellow";
+fcol=0;
+break;
+}　
+switch(hcol){
+case 0:
+hc="red";
+hcol=1;
+break;
+case 1:
+hc="blue";
+hcol=2;
+break;
+default:
+hc="yellow";
+hcol=0;
+break;
+}
+switch(icol){
+case 0:
+ic="red"
+icol=1;
+break;
+case 1:
+ic="blue"
+icol=2;
+break; 
+default:
+ic="yellow";
+icol=0;
+break;
+}
+ctf=touf.getContext('2d');
+ctf.fillStyle=fc;
+ctf.fillRect(0,0,100,100);
+cth=touh.getContext('2d');
+cth.fillStyle=hc;
+cth.fillRect(0,0,100,100);
+cti=toui.getContext('2d');
+cti.fillStyle=ic;
+cti.fillRect(0,0,100,100);
+end2();
+}
+},false);
+function end2(){
+if(acol==0&&bcol==0&&ccol==0&&dcol==0&&ecol==0&&fcol==0&&gcol==0&&hcol==0&&icol==0){
+alert("おめでとう！");
+}}
+
+window.addEventListener('load', function(e) {
+setInterval(timer(),1000);
+acol=Math.floor(Math.random()*2);
+bcol=Math.floor(Math.random()*2);
+ccol=Math.floor(Math.random()*2);
+dcol=Math.floor(Math.random()*2);
+ecol=Math.floor(Math.random()*2);
+fcol=Math.floor(Math.random()*2);
+gcol=Math.floor(Math.random()*2);
+hcol=Math.floor(Math.random()*2);
+icol=Math.floor(Math.random()*2);
+switch(acol){
+case 1:
+ac="blue";
+acol=2;
+break;
+default:
+ac="red";
+acol=1;
+break;
+}
+switch(bcol){
+case 1:
+bc="blue";
+bcol=2;
+break;
+default:
+bc="red";
+bcol=1;
+break;
+}
+switch(ccol){
+case 1:
+cc="blue";
+ccol=2;
+break;
+default:
+cc="red";
+ccol=1;
+break;
+}
+switch(dcol){
+case 1:
+dc="blue";
+dcol=2;
+break;
+default:
+dc="red";
+dcol=1;
+break;
