@@ -66,11 +66,130 @@ class activation_function():
             return x
         def dif(x):
             return np.ones(x.shape)
+    
+class Optimizer():
+    class GD():
+        def __init__(self,lr=0.1):
+            self.lr=lr
+        def update(self,weight,bias,weight_grad,bias_grad):
+            weight-=self.lr*weight_grad
+                #バイアスの重みを更新
+            bias-=self.lr*bias_grad
+            return weight,bias
+            
+    class Momentum():
+        def __init__(self,lr,beta):
+            self.lr=lr
+            self.beta=beta
+            self.v=0
+            self.v_bias=0
+        def update(self,weight,bias,weight_grad,bias_grad):
+            self.v=self.beta*self.v-self.lr*weight_grad
+            self.v_bias=self.beta*self.v_bias-self.lr*bias_grad
+            
+            weight+=self.v
+            bias+=self.v_bias
+            return weight,bias
+#わからない
+    class Nestrov():
+        def __init__(self,lr,beta):
+            self.lr=lr
+            self.beta=beta
+            self.v=0
+            self.v_bias=0
+        def update(self,weight,bias,weight_grad,bias_grad):
+
+            self.v=self.beta*self.v-self.lr*weight_grad
+            self.v_bias=self.beta*self.v_bias-self.lr*bias_grad
+            
+            weight+=self.v
+            bias+=self.v_bias
+
+#initに問題あり、sの形が問題
+    class Adagrad():
+        def __init__(self,lr):
+            self.lr=lr
+            self.s=0
+            self.s_bias=0
+        def update(self,weight,bias,weight_grad,bias_grad):
+            self.s+=weight_grad**2
+            self.s_bias=bias_grad**2
+            
+            weight-=self.lr*weight_grad/(np.sqrt(self.s)+1e-7)
+            bias-=self.lr*bias_grad/(np.sqrt(self.s_bias)+1e-7)
+            return weight,bias
+
+    class RMSprop():
+        def __init__(self,lr,dr):
+            self.lr=lr
+            self.dr=dr
+            self.s=0
+            self.s_bias=0
+        def update(self,weight,bias,weight_grad,bias_grad):
+            self.s=self.s*self.dr+(1-self.dr)*weight_grad*weight_grad
+            self.s_bias=self.s_bias*self.dr+(1-self.dr)*bias_grad*bias_grad
+
+            weight-= self.lr*weight_grad/(np.sqrt(self.s)+1e-7)
+            bias-= self.lr*bias_grad/(np.sqrt(self.s_bias)+1e-7)
+            return weight,bias
+        
+#同様
+    class Adadelta():
+        def __init__(self,lr,dr):
+            self.pre_weight_grad=0
+            self.pre_bias_grad=0
+            self.dr=dr
+            self.s=0
+            self.s_bias=0
+        def update(self,weight,bias,weight_grad,bias_grad):
+            delta_w=weight_grad-self.pre_weight_grad+1e-7
+            delta_b=bias_grad-self.pre_bias_grad+1e-7
+            self.pre_weight_grad=weight_grad
+            self.pre_bias_grad=bias_grad
+            self.s=self.s*self.dr+(1-self.dr)*weight_grad*weight_grad
+            self.s_bias=self.s_bias*self.dr+(1-self.dr)*bias_grad*bias_grad
+
+            weight-=delta_w*weight_grad/(np.sqrt(self.s)+1e-7)
+            bias-=delta_b*bias_grad/(np.sqrt(self.s)+1e-7)
+            return weight,bias
+
+    class Adam():
+        def __init__(self,lr=0.001,beta1=0.9,beta2=0.999):
+            self.lr=lr
+            self.beta1=beta1
+            self.beta2=beta2
+
+            self.v=0
+            self.v_bias=0
+
+            self.m=0
+            self.m_bias=0
+            
+            self.t=0
+        def update(self,weight,bias,weight_grad,bias_grad):
+
+            self.t+=1
+
+            self.m=self.beta1*self.m+(1-self.beta1)*weight_grad
+            self.m_bias=self.beta1*self.m_bias+(1-self.beta1)*bias_grad
+
+            self.v=self.beta2*self.v+(1-self.beta2)*(weight_grad*weight_grad)
+            self.v_bias=self.beta2*self.v_bias+(1-self.beta2)*(bias_grad*bias_grad)
+
+            m_hat=self.m/(1-self.beta1**self.t)
+            m_bias_hat=self.m_bias/(1-self.beta1**self.t)
+            v_hat=self.v/(1-self.beta1**self.t)
+            v_bias_hat=self.v_bias/(1-self.beta1**self.t)
+
+            weight-=self.lr*m_hat/(np.sqrt(v_hat)+1e-7)
+            bias-=self.lr*m_bias_hat/(np.sqrt(v_bias_hat)+1e-7)
+            return weight,bias
+
 class Layer():
     #全結合
     class FC():
         #FC(入力サイズ,出力サイズ,活性化関数,評価関数,学習率,バッチ数)
-        def __init__(self,input_size,output_size,activation_func=activation_function.Sigmoid,evaluation_func=None,learning_rate=0.01,batch_num=1):
+        def __init__(self,input_size,output_size,optimizer,activation_func=activation_function.Sigmoid,evaluation_func=None,lr=0.1,batch_num=1):
             self.input_size=input_size
             self.output_size=output_size
             if activation_func==activation_function.ReLU:
@@ -79,7 +198,7 @@ class Layer():
             else:
                 self.weight=np.random.normal(0.0,input_size**-0.5,(output_size,input_size))
                 self.bias_w=np.random.normal(0.0,input_size**-0.5,(output_size))
-            self.learning_rate=learning_rate
+            
             self.h=np.zeros(output_size)
             self.evaluation_func=evaluation_func
             self.activate_func=activation_func
@@ -89,6 +208,7 @@ class Layer():
             self.teacher_vector=None
             self.batch_num=batch_num
             self.batch_count=0
+            self.optimizer=optimizer
             self.grad=np.zeros_like(self.weight)
             self.bias_grad=np.zeros_like(self.bias_w)
         def set_weight(self,w,bw):
@@ -116,10 +236,9 @@ class Layer():
             self.batch_count+=1
             self.error=self.out_error@self.weight  
             if self.batch_count==self.batch_num:
-                #重みを更新
-                self.weight=self.weight-self.learning_rate*self.grad/self.batch_num
-                #バイアスの重みを更新
-                self.bias_w=self.bias_w-self.learning_rate*self.bias_grad/self.batch_num
+                self.grad/=self.batch_num
+                self.bias_grad/=self.batch_num
+                self.weight,self.bias_w=self.optimizer.update(self.weight,self.bias_w,self.grad,self.bias_grad)
                 self.grad=np.zeros_like(self.weight)
                 self.bias_grad=np.zeros_like(self.bias_w)
                 self.batch_count=0   
@@ -133,8 +252,9 @@ class Layer():
             self.error=forward_error@self.weight 
             if self.batch_count==self.batch_num:
                 #以下で重みを更新していく
-                self.weight=self.weight-self.learning_rate*self.grad/self.batch_num
-                self.bias_w=self.bias_w-self.learning_rate*self.bias_grad/self.batch_num
+                self.grad/=self.batch_num
+                self.bias_grad/=self.batch_num
+                self.weight,self.bias_w=self.optimizer.update(self.weight,self.bias_w,self.grad,self.bias_grad)
                 self.grad=np.zeros_like(self.weight)
                 self.bias_grad=np.zeros_like(self.bias_w)
                 self.batch_count=0
@@ -146,8 +266,9 @@ class Layer():
             self.batch_count+=1
             if self.batch_count==self.batch_num:
                 #以下で重みを更新していく
-                self.weight=self.weight-self.learning_rate*self.grad/self.batch_num
-                self.bias_w=self.bias_w-self.learning_rate*self.bias_grad/self.batch_num
+                self.grad/=self.batch_num
+                self.bias_grad/=self.batch_num
+                self.weight,self.bias_w=self.optimizer.update(self.weight,self.bias_w,self.grad,self.bias_grad)
                 self.grad=np.zeros_like(self.weight)
                 self.bias_grad=np.zeros_like(self.bias_w)
                 self.batch_count=0
@@ -174,13 +295,12 @@ class Layer():
             return Evaluation_function.Cross_Entropy.func(self.output,self.teacher_vector)
     class FC_Softmax_CrossEntropy():
         #FC(入力サイズ,出力サイズ,活性化関数,評価関数,学習率,バッチ数)
-        def __init__(self,input_size,output_size,learning_rate=0.01,batch_num=1):
+        def __init__(self,input_size,output_size,optimizer,batch_num=1):
             self.input_size=input_size
             self.output_size=output_size
          
             self.weight=np.random.normal(0.0,input_size**-0.5,(output_size,input_size))
             self.bias_w=np.random.normal(0.0,input_size**-0.5,(output_size))
-            self.learning_rate=learning_rate
             self.h=np.zeros(output_size)
             self.output=np.zeros(output_size)
             self.error=np.zeros(input_size)
@@ -188,6 +308,7 @@ class Layer():
             self.teacher_vector=None
             self.batch_num=batch_num
             self.batch_count=0
+            self.optimizer=optimizer
             self.grad=np.zeros_like(self.weight)
             self.bias_grad=np.zeros_like(self.bias_w)
         def set_weight(self,w,bw):
@@ -216,9 +337,9 @@ class Layer():
             self.error=self.out_error@self.weight  
             if self.batch_count==self.batch_num:
                 #重みを更新
-                self.weight=self.weight-self.learning_rate*self.grad/self.batch_num
-                #バイアスの重みを更新
-                self.bias_w=self.bias_w-self.learning_rate*self.bias_grad/self.batch_num
+                self.grad/=self.batch_num
+                self.bias_grad/=self.batch_num
+                self.weight,self.bias_w=self.optimizer.update(self.weight,self.bias_w,self.grad,self.bias_grad)
                 self.grad=np.zeros_like(self.weight)
                 self.bias_grad=np.zeros_like(self.bias_w)
                 self.batch_count=0   
@@ -232,8 +353,9 @@ class Layer():
             self.error=forward_error@self.weight 
             if self.batch_count==self.batch_num:
                 #以下で重みを更新していく
-                self.weight=self.weight-self.learning_rate*self.grad/self.batch_num
-                self.bias_w=self.bias_w-self.learning_rate*self.bias_grad/self.batch_num
+                self.grad/=self.batch_num
+                self.bias_grad/=self.batch_num
+                self.weight,self.bias_w=self.optimizer.update(self.weight,self.bias_w,self.grad,self.bias_grad)
                 self.grad=np.zeros_like(self.weight)
                 self.bias_grad=np.zeros_like(self.bias_w)
                 self.batch_count=0
@@ -245,8 +367,9 @@ class Layer():
             self.batch_count+=1
             if self.batch_count==self.batch_num:
                 #以下で重みを更新していく
-                self.weight=self.weight-self.learning_rate*self.grad/self.batch_num
-                self.bias_w=self.bias_w-self.learning_rate*self.bias_grad/self.batch_num
+                self.grad/=self.batch_num
+                self.bias_grad/=self.batch_num
+                self.weight,self.bias_w=self.optimizer.update(self.weight,self.bias_w,self.grad,self.bias_grad)
                 self.grad=np.zeros_like(self.weight)
                 self.bias_grad=np.zeros_like(self.bias_w)
                 self.batch_count=0
@@ -274,7 +397,7 @@ class Layer():
             return Evaluation_function.Cross_Entropy.func(self.output,self.teacher_vector)
     class CNN():
         #畳み込みニューラルネットワーク(データの行,列,チャネル,kernelの行,kernelの列,カーネルのチャネル,stride,活性化関数,学習率)
-        def __init__(self,row,column,channel,kernel_row,kernel_column,kernel_channel,st=1,activation_func=activation_function.ReLU,learning_rate=0.01,batch_num=1):
+        def __init__(self,row,column,channel,kernel_row,kernel_column,kernel_channel,st,optimizer,activation_func=activation_function.ReLU,batch_num=1):
             self.row=row
             self.column=column
             #strideとデータとカーネルの都合がいいとたたみ込み可能
@@ -292,13 +415,13 @@ class Layer():
                 self.grad=np.zeros_like(self.weight)
                 self.weight=np.random.normal(0.0,(row*column*channel)**-0.5,(kernel_channel,channel*kernel_row*kernel_column))
                 self.bias_w=np.random.normal(0.0,(row*column*channel)**-0.5,(kernel_channel))
+                self.optimizer=optimizer
                 #バイアスの重みを作成
                 self.bias_grad=np.zeros_like(self.bias_w)
 
                 self.output_all_unit=kernel_channel*self.output_H*self.output_W
                 #活性化関数
                 self.activation_func=activation_func
-                self.learning_rate=learning_rate
 
                 #とりあえず出力結果を作成
                 self.output=np.zeros((kernel_channel,self.output_H,self.output_W))
@@ -375,8 +498,9 @@ class Layer():
             self.batch_count+=1
             if self.batch_count==self.batch_num:
                 #重み修正          
-                self.bias_w-=self.learning_rate*self.bias_grad
-                self.weight-=self.learning_rate*self.grad
+                self.grad/=self.batch_num
+                self.bias_grad/=self.batch_num
+                self.weight,self.bias_w=self.optimizer.update(self.weight,self.bias_w,self.grad,self.bias_grad)
                 self.grad=np.zeros_like(self.weight)
                 self.bias_grad=np.zeros_like(self.bias_w)
             return self.error
@@ -389,8 +513,9 @@ class Layer():
             #重み修正          
             self.batch_count+=1
             if self.batch_count==self.batch_num:
-                self.bias_w-=self.learning_rate*self.bias_grad
-                self.weight-=self.learning_rate*self.grad
+                self.grad/=self.batch_num
+                self.bias_grad/=self.batch_num
+                self.weight,self.bias_w=self.optimizer.update(self.weight,self.bias_w,self.grad,self.bias_grad)
                 self.grad=np.zeros_like(self.weight)
                 self.bias_grad=np.zeros_like(self.bias_w)
             return self.error
