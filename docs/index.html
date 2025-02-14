@@ -26,13 +26,15 @@
 <BR>
 <input type="checkbox" name="W" value="5" checked>MR
 </fieldset>
-<button onclick="make_weapon()">ランダムに作成</button>
+<button onclick="make_weapon()">作成</button>
 <BR>
 
-<button onclick="random_gunsmith()">武器を決めて作成</button>
-<BR>
-<input id="dicide_weapon" type="text" value="KN-44">
 
+武器固定 : <input id="dicide_weapon" type="text" value="KN-44">
+<BR>
+<button onclick="random_gunsmith()">武器固定作成</button>
+
+<BR>
 セットするガンスミスの数
 <form>
   <label><input type="radio" name="number" value="1"> 1</label>
@@ -41,7 +43,39 @@
   <label><input type="radio" name="number" value="4"> 4</label>
   <label><input type="radio" name="number" value="5" checked> 5</label>
 </form>
-
+<h1>説明</h1>
+1. 作成ボタンを押すことでランダムにガンスミスを設定してくれます.
+<BR>
+2. 作成した武器はコピーのボタンを押すことで端末が自動でコピーします.
+<BR>
+3. CODmの画面を開き,テキトーな武器を選んでガンスミスの画面を開きます.
+<BR>
+4. 右下にある"NO."と書いてあるボタンを押し,コピーした内容を貼り付け(ペースト)します.
+<BR>
+5. 装備を押すと完成です.
+<BR>
+武器固定に正しく武器名を入力し,武器固定作成を押すとその武器のガンスミスを作成してくれます.
+<BR>
+当サイトで認識している現時点の最新武器はXM4です.
+<BR>
+<h1>注意</h1>
+CODm内で"このコードにマッチするものが見つかりません"と表示された場合は当サイトのプログラムのミスです.
+再度作成してください.
+<BR>
+競合不可能な武器は選ばないように設定してあります.(デュアルやインテグラルサプレッサー等に対してプログラムを書くのが非常にめんどくさいから.)
+<BR>
+ルームでの縛りプレイ等がメインで作成したプログラムとなります.
+<BR>
+ランクマッチで使用する場合は自己責任でお願い致します.(当たり前)
+<BR>
+<h1>その他</h1>
+当サイトを自由に使用していただいて構いません.
+<BR>
+  しんじゅ(@sj_select)に理論の提案や一部コード作成をして頂きました.
+  <BR>
+意見,アドバイス,提案,質問はXアカウントのほつすすねる(@tanakakuuunnn)まで気軽に連絡して頂けると幸いです.
+<BR>
+全員武器ガンスミスランダム縛りのルームをやってみたい.
 <script>
 
 function sumArray(x){
@@ -221,7 +255,7 @@ if (result) {
   weapon_type=result[0];
   weapon_name=result[1];
 } else {
-  alert("見つかりませんでした。正しい武器名を記述してください。");
+  alert("武器名が正しくないか,当サイトの現バージョンでは存在しません.");
   return "error"
 }
   //まずるなどの数値とその中の英文字
