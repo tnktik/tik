@@ -40,10 +40,20 @@
       font-weight: bold;
       color: purple;
   }
+
+  .top-right-text {
+      position: fixed; /* 画面上の固定位置 */
+      top: 10px;  /* 上から10px */
+      right: 10px; /* 右から10px */
+      font-size: 16px; /* 文字サイズ */
+      color: gray; /* 文字色 */
+      padding: 5px 10px; /* 余白 */
+      border-radius: 5px; /* 角丸 */
+  }
 </style>
 </head>
 <body>
-
+  <div class="top-right-text">Version : 1.1.0</div>
 <BR>
 <p class="s_text1">君だけの最強武器を見つけよう！</p>
 <p class="s_text2">無料！！</p>
@@ -77,12 +87,24 @@
   <label><input type="radio" name="number" value="4"> 4</label>
   <label><input type="radio" name="number" value="5" checked> 5</label>
 </form>
-
+ガンスミスの数ランダムモード(1~5個) : <input type="checkbox" id="rand_num_gunsmith">
 <BR>
 武器固定モード : <input type="checkbox" id="fixed_weapon">
 <BR>
 武器固定 : <input id="dicide_weapon" type="text" value="KN-44">
 <BR>
+  出現するガンスミス
+  <form>
+    <label><input type="checkbox" name="rep_gunsmith" value="1" checked> マズル</label>
+    <label><input type="checkbox" name="rep_gunsmith" value="2" checked> バレル</label>
+    <label><input type="checkbox" name="rep_gunsmith" value="3" checked> サイト</label>
+    <label><input type="checkbox" name="rep_gunsmith" value="4" checked> ストック</label>
+    <label><input type="checkbox" name="rep_gunsmith" value="5" checked> PERK</label>
+    <label><input type="checkbox" name="rep_gunsmith" value="6" checked> レーザー</label>
+    <label><input type="checkbox" name="rep_gunsmith" value="7" checked> アンダーバレル</label>
+    <label><input type="checkbox" name="rep_gunsmith" value="8" checked> 弾薬</label>
+    <label><input type="checkbox" name="rep_gunsmith" value="9" checked> リアグリップ</label>
+  </form>
   武器選択モード
   <form>
     <label><input type="radio" name="prob_mode_weapon" value="0" checked>色んな武器を使いたい</label>
@@ -119,7 +141,7 @@
 <BR>
 <BR>
 
-当サイトで認識している現時点の最新武器はXM4です.
+当サイトで認識している現時点の最新武器はVLK Rogueです.
 <BR>
 <h1>注意</h1>
 CODm内で"このコードにマッチするものが見つかりません"と表示された場合は当サイトのプログラムのミスです.
@@ -162,7 +184,7 @@ const weapons=[["Type 25","M16","AK117","AK-47","ASM10","M4","BK57","LK24","ICR-
               ["RUS-79U","Chicom","PDW-57","Razorback","MSMC","HG 40","Pharo","GKS","Cordite","QQ9","Fennec","AGR 556","QXR","PP19 Bizon",
               "MX9","CBR4","PPSh-41","MAC-10","KSP 45","Switchblade X9","LAPA","OTs 9","Striker 45","CX-9","TEC-9","ISO","USS 9"],
               ["S36","UL736","RPD","M4LMG", "Chopper", "Holger 26","Hades","PKM", "Dingo","Bruen MK9","MG42","RAAL MG"],
-              ["HS2126","BY15","HS0405","Striker","KRM-262","Echo","R9-0","JAK-12","Argus"],
+              ["HS2126","BY15","HS0405","Striker","KRM-262","Echo","R9-0","JAK-12","Argus","VLK Rogue"],
               ["Kilo Bolt-Action","SKS","SP-R 208","MK2","Type 63"]];
 
 //AK117のバレルYKMを除いていたりする。
@@ -191,7 +213,7 @@ const weapon_parts_char=[[[6,3,18,3,8,3,5,3,5],[6,2,18,4,9,3,5,2,3],[7,3,18,4,8,
                      [7,4,20,5,8,0,6,4,10],[6,3,18,4,6,1,4,2,3]], //RAAL
                   //SG
                     [[6,3,15,3,6,3,2,3,3],[7,3,15,4,6,3,6,2,3],[6,2,15,2,6,3,2,2,3],[6,4,15,3,6,3,2,3,3],[7,3,15,5,6,3,4,2,3],
-                     [6,3,15,4,6,3,2,3,3],[6,2,15,2,6,3,3,3,3],[7,3,15,3,6,3,5,4,3],[4,3,12,5,6,3,3,3,4]], //argus
+                     [6,3,15,4,6,3,2,3,3],[6,2,15,2,6,3,3,3,3],[7,3,15,3,6,3,5,4,3],[4,3,12,5,6,3,3,3,4],[7,3,15,4,6,3,3,4,3]], //VLK Rogue
                 //MR
                     [[6,3,19,3,8,1,1,3,3],[5,3,8,3,8,1,6,2,3],[6,3,18,4,7,1,6,3,2],[6,3,18,4,7,1,0,1,3],[6,6,7,6,7,3,6,6,6]]] //type63
 
@@ -250,8 +272,14 @@ function findWeaponIndex(weaponName) {
 }
 
 function make_weapon_structure(){
-      const selected_sgn = document.querySelector('input[name="number"]:checked');
-      set_gunsmith_num = selected_sgn.value; // セットするガンスミスの数
+      const rngm = document.getElementById("rand_num_gunsmith")
+      rand_num_gunsmith_mode = rngm.checked; // セットするガンスミスの数
+      if(rand_num_gunsmith_mode==false){
+        const selected_sgn = document.querySelector('input[name="number"]:checked');
+        set_gunsmith_num = selected_sgn.value; // セットするガンスミスの数
+      }else{
+        set_gunsmith_num=Math.floor(Math.random()*5)+1;
+      }
       const selected_pmw = document.querySelector('input[name="prob_mode_weapon"]:checked');
       
       prob_mode_weapon = selected_pmw.value; // 確率のモード
@@ -304,14 +332,29 @@ function make_weapon_structure(){
         new_char_parts=[];
 
         var temp_weapon_parts_char = JSON.parse(JSON.stringify(weapon_parts_char[weapon_type][weapon_name]));
-        
+        var rg=document.getElementsByName("rep_gunsmith");
+        //modeによって処理を変える
         if(prob_mode_gunsmith==0){
+          //出現するガンスミスを設定する
+          for(var i=0;i<temp_weapon_parts_char.length;i++){
+            if(rg[i].checked==true){
+              continue
+            }else{
+              temp_weapon_parts_char[i]=0
+            }
+          }
         }else if(prob_mode_gunsmith==1){
           for(var i=0;i<temp_weapon_parts_char.length;i++){
             if(temp_weapon_parts_char[i]==0){
               continue
             }else{
-              temp_weapon_parts_char[i]=1
+              //出現するガンスミスを設定する
+              if(rg[i].checked==true){
+                temp_weapon_parts_char[i]=1
+              }else{
+                //0にすることで出現させなくする.
+                temp_weapon_parts_char[i]=0
+              }
             }
           }
         }
