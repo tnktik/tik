@@ -50,18 +50,62 @@
       padding: 5px 10px; /* 余白 */
       border-radius: 5px; /* 角丸 */
   }
+  /* ボタンのデザイン */
+  .make_weapon_button {
+            font-size: 20px;  /* 文字サイズ */
+            padding: 10px 20px;  /* ボタン内の余白 */
+            background-color: #007BFF;  /* 背景色（青色） */
+            color: white;  /* 文字色 */
+            border: none;  /* 枠線なし */
+            border-radius: 10px;  /* 角丸 */
+            cursor: pointer;  /* カーソルをポインターに */
+            transition: 0.3s;  /* アニメーション */
+        }
+
+        /* ホバー時のデザイン */
+        .custom-button:hover {
+            background-color: #0056b3;  /* ホバー時の背景色 */
+        }
+
+        /* クリック時のデザイン */
+        .custom-button:active {
+            background-color: #004494;
+        }
+  /* ボタンのデザイン */
+  .copy_button {
+            font-size: 20px;  /* 文字サイズ */
+            padding: 10px 20px;  /* ボタン内の余白 */
+            background-color: #007BFF;  /* 背景色（青色） */
+            color: white;  /* 文字色 */
+            border: none;  /* 枠線なし */
+            border-radius: 10px;  /* 角丸 */
+            cursor: pointer;  /* カーソルをポインターに */
+            transition: 0.3s;  /* アニメーション */
+        }
+
+        /* ホバー時のデザイン */
+        .custom-button:hover {
+            background-color: #0056b3;  /* ホバー時の背景色 */
+        }
+
+        /* クリック時のデザイン */
+        .custom-button:active {
+            background-color: #004494;
+        }
 </style>
 </head>
 <body>
-  <div class="top-right-text">Version : 1.1.0</div>
+  <div class="top-right-text">Version : 1.1.1</div>
 <BR>
 <p class="s_text1">君だけの最強武器を見つけよう！</p>
 <p class="s_text2">無料！！</p>
 <p class="s_text3">最高！</p>
 <p class="s_text4">怪しくないよ！</p>
 <div id="copyTarget"> </div>
-<button onclick="copyToClipboard()">コピー</button>
+<button class="make_weapon_button" onclick="make_weapon()">作成</button>
+<button class="copy_button" onclick="copyToClipboard()">コピー</button>
 <BR>
+<h3>設定</h3>
 <fieldset>
 <legend>ランダムで現れる武器の種類</legend>
 <input type="checkbox" name="W" value="0" checked>AR
@@ -76,24 +120,30 @@
 <BR>
 <input type="checkbox" name="W" value="5" checked>MR
 </fieldset>
-<button onclick="make_weapon()">作成</button>
 <BR>
   
-セットするガンスミスの数
+
+<fieldset>
+  <legend>セットするガンスミスの数</legend>
 <form>
   <label><input type="radio" name="number" value="1"> 1</label>
   <label><input type="radio" name="number" value="2"> 2</label>
   <label><input type="radio" name="number" value="3"> 3</label>
   <label><input type="radio" name="number" value="4"> 4</label>
   <label><input type="radio" name="number" value="5" checked> 5</label>
+  <BR>
+  ランダム(1~5個) : <input type="checkbox" id="rand_num_gunsmith">
 </form>
-ガンスミスの数ランダムモード(1~5個) : <input type="checkbox" id="rand_num_gunsmith">
-<BR>
+</fieldset>
+
+  <fieldset>
+    <legend>武器固定</legend>
 武器固定モード : <input type="checkbox" id="fixed_weapon">
 <BR>
-武器固定 : <input id="dicide_weapon" type="text" value="KN-44">
-<BR>
-  出現するガンスミス
+武器名 : <input id="dicide_weapon" type="text" value="KN-44">
+</fieldset>
+  <fieldset>
+    <legend>出現するガンスミス</legend>
   <form>
     <label><input type="checkbox" name="rep_gunsmith" value="1" checked> マズル</label>
     <label><input type="checkbox" name="rep_gunsmith" value="2" checked> バレル</label>
@@ -105,18 +155,24 @@
     <label><input type="checkbox" name="rep_gunsmith" value="8" checked> 弾薬</label>
     <label><input type="checkbox" name="rep_gunsmith" value="9" checked> リアグリップ</label>
   </form>
-  武器選択モード
+</fieldset>
+  
+  <fieldset>
+    <legend>武器選択モード</legend>
   <form>
     <label><input type="radio" name="prob_mode_weapon" value="0" checked>色んな武器を使いたい</label>
     <BR>
     <label><input type="radio" name="prob_mode_weapon" value="1">色んなクラス(ARやSRなど)を使いたい</label>
   </form>
-  ガンスミス選択モード
+</fieldset>
+  <fieldset>
+    <legend>ガンスミス選択モード</legend>
   <form>
     <label><input type="radio" name="prob_mode_gunsmith" value="0" checked>色んなアタッチメントを使いたい</label>
     <BR>
     <label><input type="radio" name="prob_mode_gunsmith" value="1">バレルやサイトなどを等しく使いたい</label>
   </form>
+</fieldset>
 <h1>説明</h1>
 1. 作成ボタンを押すことでランダムにガンスミスを設定してくれます.
 <BR>
