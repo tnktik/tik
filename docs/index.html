@@ -95,7 +95,7 @@
 </style>
 </head>
 <body>
-  <div class="top-right-text">Version : 1.1.2</div>
+  <div class="top-right-text">Version : 1.1.3</div>
 <BR>
 <p class="s_text1">君だけの最強武器を見つけよう！</p>
 <p class="s_text2">無料！！</p>
@@ -233,6 +233,7 @@ CODm内で"このコードにマッチするものが見つかりません"と�
 
 全員武器ガンスミスランダム縛りのルームをやってみたい.
 <script>
+
 const weapons=[["Type 25","M16","AK117","AK-47","ASM10","M4","BK57","LK24","ICR-1","Man-O-War",
                 "KN-44","HBRa3","HVK-30","DR-H","Peacekeeper MK2","FR .556","AS VAL","CR-56 AMAX",
                 "M13","Swordfish","Kilo 141","Oden","Krig 6","EM2","Maddox","FFAR 1","Grau 5.56",
@@ -272,7 +273,7 @@ const weapon_parts_char=[[[6,3,18,3,8,3,5,3,5],[6,2,18,4,9,3,5,2,3],[7,3,18,4,8,
                     [[6,3,15,3,6,3,2,3,3],[7,3,15,4,6,3,6,2,3],[6,2,15,2,6,3,2,2,3],[6,4,15,3,6,3,2,3,3],[7,3,15,5,6,3,4,2,3],
                      [6,3,15,4,6,3,2,3,3],[6,2,15,2,6,3,3,3,3],[7,3,15,3,6,3,5,4,3],[4,3,12,5,6,3,3,3,4],[7,3,15,4,6,3,3,4,3]], //VLK Rogue
                 //MR
-                    [[6,3,19,3,8,1,1,3,3],[5,3,8,3,8,1,6,2,3],[6,3,18,4,7,1,6,3,2],[6,3,18,4,7,1,0,1,3],[6,6,7,6,7,3,6,6,6]]] //type63
+                    [[6,3,19,3,8,1,1,3,3],[5,3,8,3,8,1,6,2,3],[6,3,18,4,7,1,6,3,2],[6,3,18,4,7,1,0,1,3],[6,6,7,6,7,3,6,6,6]]]; //type63
 
                     
 //武器の数、追加ごとに更新最新は[XM4,たんどら,USS,Raal,argus,type63]
@@ -333,7 +334,7 @@ function findWeaponIndex(weaponName) {
 const select_w = document.getElementById("weapon-select");
 
 // 武器リストを追加
-for(var i=0;i<weapons[i].length;i++){
+for(var i=0;i<weapons.length;i++){
   for(var j=0;j<weapons[i].length;j++){
 
     const option = document.createElement("option");
@@ -418,22 +419,22 @@ function make_weapon_structure(){
         }else if(prob_mode_gunsmith==1){
           for(var i=0;i<temp_weapon_parts_char.length;i++){
             if(temp_weapon_parts_char[i]==0){
-              continue
+              continue;
             }else{
               //出現するガンスミスを設定する
               if(rg[i].checked==true){
-                temp_weapon_parts_char[i]=1
+                temp_weapon_parts_char[i]=1;
               }else{
                 //0にすることで出現させなくする.
-                temp_weapon_parts_char[i]=0
+                temp_weapon_parts_char[i]=0;
               }
             }
           }
         }
         //ランダムにガンスミスの種類をきめる
         for(var i=0;i<set_gunsmith_num;i++){
-          a=choice(Math.random(),temp_weapon_parts_char)
-          new_num_parts.push(num_parts[a])
+          a=choice(Math.random(),temp_weapon_parts_char);
+          new_num_parts.push(num_parts[a]);
           num_parts.splice(a,1);
           temp_weapon_parts_char.splice(a,1);
         }
@@ -441,42 +442,52 @@ function make_weapon_structure(){
         nnp=new_num_parts.sort()
         //上で決めた種類に対して詳しくどれかのパーツを決める(粒状グリップテープやOWCマークスマンなど)
         for(var i=0;i<set_gunsmith_num;i++){
+          char_parts=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+          //Switchblade X9のperkの例外処理
+          if(nnp[i]==5 && weapon_type==2 && weapon_name==19){
+            char_parts=["A","B","C","D","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+          }
+          //Striker 45のperkの例外処理
+          if(nnp[i]==8 && weapon_type==2 && weapon_name==22){
+            char_parts=["A","C","D","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+          }
           //スナイパーのサイト例外処理
           if(nnp[i]==3 && weapon_type==1){
             char_parts=["B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+          }
           //マークスマンのサイト例外処理
-          }else if(nnp[i]==3 && weapon_type==5){
+          if(nnp[i]==3 && weapon_type==5){
             char_parts=["B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
             //kiloboltactionの例外処理
             if(weapon_name==0){
-              char_parts=["C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+              char_parts=["C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
             }
             //type63の例外処理
             if(weapon_name==4){
-              char_parts=["C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+              char_parts=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
             }
-          }else{
-            char_parts=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
           }
+      
+          
           a=Math.floor(Math.random()*weapon_parts_char[weapon_type][weapon_name][nnp[i]-1]);
           new_char_parts.push(char_parts[a]);
         }
         //以下はアタッチメントコードの文字列を取得するために配列に格納していく
-        new_weapon.push(weapons[weapon_type][weapon_name])
-        new_weapon.push("-")
+        new_weapon.push(weapons[weapon_type][weapon_name]);
+        new_weapon.push("-");
         for(var i=0;i<set_gunsmith_num;i++){
           new_weapon.push(new_num_parts[i]);
           new_weapon.push(new_char_parts[i]);
         }
         //配列の要素をくっつけて文字列を返す
-        return new_weapon.join("")
+        return new_weapon.join("");
 }
 
 
 
 function copyToClipboard() {
     const text = document.getElementById("copyTarget").textContent; // `<div>` のテキストを取得
-    navigator.clipboard.writeText(text) // クリップボードにコピー
+    navigator.clipboard.writeText(text); // クリップボードにコピー
   }
 
 //更新
