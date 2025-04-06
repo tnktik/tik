@@ -95,7 +95,7 @@
 </style>
 </head>
 <body>
-  <div class="top-right-text">Version : 1.1.5</div>
+  <div class="top-right-text">Version : 1.2.0</div>
 <BR>
 <p class="s_text1">君だけの最強武器を見つけよう！</p>
 <p class="s_text2">無料！！</p>
@@ -198,7 +198,7 @@
 <BR>
 <BR>
 
-当サイトで認識している現時点の最新武器はVLK Rogueです.
+当サイトで認識している現時点の最新武器はM1 Garandです.
 <BR>
 <h1>注意</h1>
 CODm内で"このコードにマッチするものが見つかりません"と表示された場合は当サイトのプログラムのミスです.
@@ -243,7 +243,7 @@ const weapons=[["Type 25","M16","AK117","AK-47","ASM10","M4","BK57","LK24","ICR-
               "MX9","CBR4","PPSh-41","MAC-10","KSP 45","Switchblade X9","LAPA","OTs 9","Striker 45","CX-9","TEC-9","ISO","USS 9"],
               ["S36","UL736","RPD","M4LMG", "Chopper", "Holger 26","Hades","PKM", "Dingo","Bruen MK9","MG42","RAAL MG"],
               ["HS2126","BY15","HS0405","Striker","KRM-262","Echo","R9-0","JAK-12","Argus","VLK Rogue"],
-              ["Kilo Bolt-Action","SKS","SP-R 208","MK2","Type 63"]];
+              ["Kilo Bolt-Action","SKS","SP-R 208","MK2","Type 63","M1 Garand"]];
 
 //AK117のバレルYKMを除いていたりする。
 const weapon_parts_char=[[[6,3,18,3,8,3,5,3,5],[6,2,18,4,9,3,5,2,3],[7,3,18,4,8,3,6,2,3],[6,4,18,5,8,3,5,3,3],[6,4,18,4,8,3,5,2,3],
@@ -273,7 +273,8 @@ const weapon_parts_char=[[[6,3,18,3,8,3,5,3,5],[6,2,18,4,9,3,5,2,3],[7,3,18,4,8,
                     [[6,3,15,3,6,3,2,3,3],[7,3,15,4,6,3,6,2,3],[6,2,15,2,6,3,2,2,3],[6,4,15,3,6,3,2,3,3],[7,3,15,5,6,3,4,2,3],
                      [6,3,15,4,6,3,2,3,3],[6,2,15,2,6,3,3,3,3],[7,3,15,3,6,3,5,4,3],[4,3,12,5,6,3,3,3,4],[7,3,15,4,6,3,3,4,3]], //VLK Rogue
                 //MR
-                    [[6,3,17,3,8,1,1,3,3],[5,3,7,3,8,1,6,2,3],[6,3,17,4,7,1,6,3,2],[6,3,17,4,7,1,0,1,3],[6,6,7,6,7,3,6,6,6]]]; //type63
+                    [[6,3,17,3,8,1,1,3,3],[5,3,7,3,8,1,6,2,3],[6,3,17,4,7,1,6,3,2],[6,3,17,4,7,1,0,1,3],[6,6,7,6,7,3,6,6,6]
+                  ,[6,4,11,5,6,0,5,4,0]]]; //M1 Garand
 
                     
 //武器の数、追加ごとに更新最新は[XM4,たんどら,USS,Raal,argus,type63]
@@ -443,13 +444,17 @@ function make_weapon_structure(){
         //上で決めた種類に対して詳しくどれかのパーツを決める(粒状グリップテープやOWCマークスマンなど)
         for(var i=0;i<set_gunsmith_num;i++){
           char_parts=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+          //XM4のバレルの例外処理
+          if(nnp[i]==1 && weapon_type==0 && weapon_name==31){
+            char_parts=["A","B","C","D","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+          }
           //Switchblade X9のperkの例外処理
           if(nnp[i]==5 && weapon_type==2 && weapon_name==19){
             char_parts=["A","B","C","D","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
           }
           //pharoのperkの例外処理
           else if(nnp[i]==5 && weapon_type==2 && weapon_name==6){
-            char_parts=["A","C","D","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+            char_parts=["A","B","C","D","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
           }
           //Striker 45のperkの例外処理
           else if(nnp[i]==8 && weapon_type==2 && weapon_name==22){
@@ -468,6 +473,10 @@ function make_weapon_structure(){
             }
             //type63の例外処理
             if(weapon_name==4){
+              char_parts=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+            }
+            //M1 Garandの例外処理
+            if(weapon_name==5){
               char_parts=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
             }
           }
